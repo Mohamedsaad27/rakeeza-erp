@@ -1,0 +1,13 @@
+{
+    "name": "Notifications",
+    "alias": "Notifications",
+    "description": "Notifications module",
+    "keywords": [
+        "Notifications"
+    ],
+    "priority": 0,
+    "providers": [
+        "App\\Modules\\Notifications\\Infrastructure\\Providers\\NotificationsServiceProvider"
+    ],
+    "files": []
+}

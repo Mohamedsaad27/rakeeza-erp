@@ -1,0 +1,13 @@
+{
+    "name": "Tenants",
+    "alias": "Tenants",
+    "description": "Tenants module",
+    "keywords": [
+        "Tenants"
+    ],
+    "priority": 0,
+    "providers": [
+        "App\\Modules\\Tenants\\Infrastructure\\Providers\\TenantsServiceProvider"
+    ],
+    "files": []
+}
