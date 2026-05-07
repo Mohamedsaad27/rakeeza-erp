@@ -131,8 +131,7 @@ Follow `CURSOR_RULES.md` §4 with domain-specific adaptations:
 
 ### Phase 0: Foundation (Week 1)
 
-1. Install missing packages: JWT auth package, `laravel/cashier`, Laravel Horizon, `ramsey/uuid`.
-   - Create `ActivityLog` module: migration, model, repository, use cases for manual audit logging.
+1. Create `ActivityLog` module: migration, model, repository, use cases for manual audit logging.
 2. Create `Core` module: `HasUuid`, `ApiResponse`, `PaginationMeta`, `SetLocale` middleware, base service provider.
 3. Configure `config/permission.php` for UUID morph keys (no teams).
 4. Configure JWT guards: `platform` (central) and `api` (tenant).

@@ -12,7 +12,7 @@ SET FOREIGN_KEY_CHECKS = 0;
 -- ============================================================
 
 CREATE TABLE `platform_users` (
-  `id`                 CHAR(36)        NOT NULL,
+  `platform_user_id` CHAR(36)        NOT NULL,
   `name`               VARCHAR(255)    NOT NULL,
   `email`              VARCHAR(255)    NOT NULL,
   `password`           VARCHAR(255)    NOT NULL,
@@ -23,7 +23,7 @@ CREATE TABLE `platform_users` (
   `created_at`         TIMESTAMP       NULL DEFAULT NULL,
   `updated_at`         TIMESTAMP       NULL DEFAULT NULL,
   `deleted_at`         TIMESTAMP       NULL DEFAULT NULL,
-  PRIMARY KEY (`id`),
+  PRIMARY KEY (`platform_user_id`),
   UNIQUE KEY `platform_users_email_unique` (`email`),
   KEY `platform_users_is_active_idx` (`is_active`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci
@@ -96,7 +96,7 @@ CREATE TABLE `plan_features` (
 --  TENANTS
 -- ─────────────────────────────────────────────────────────
 CREATE TABLE `tenants` (
-  `id`            CHAR(36)        NOT NULL,
+  `tenant_id` CHAR(36)        NOT NULL,
   `name_en`       VARCHAR(255)    NOT NULL,
   `name_ar`       VARCHAR(255)    NOT NULL,
   `slug`          VARCHAR(100)    NOT NULL COMMENT 'subdomain: slug.rakeeza.com',
@@ -109,7 +109,7 @@ CREATE TABLE `tenants` (
   `created_at`    TIMESTAMP       NULL DEFAULT NULL,
   `updated_at`    TIMESTAMP       NULL DEFAULT NULL,
   `deleted_at`    TIMESTAMP       NULL DEFAULT NULL,
-  PRIMARY KEY (`id`),
+  PRIMARY KEY (`tenant_id`),
   UNIQUE KEY `tenants_slug_unique`  (`slug`),
   UNIQUE KEY `tenants_email_unique` (`email`),
   KEY `tenants_plan_id_fk`          (`plan_id`),
@@ -123,14 +123,14 @@ CREATE TABLE `tenants` (
 --  CENTRAL · DOMAINS  (custom domain mapping per tenant)
 -- ─────────────────────────────────────────────────────────
 CREATE TABLE `domains` (
-  `id`          CHAR(36)        NOT NULL,
+  `domain_id` CHAR(36)        NOT NULL,
   `tenant_id`   CHAR(36)        NOT NULL,
   `domain`      VARCHAR(255)    NOT NULL COMMENT 'e.g. erp.mycorp.com',
   `status`      TINYINT         NOT NULL DEFAULT 1 COMMENT '1=active | 2=inactive | 3=pending_verification',
   `verified_at` TIMESTAMP       NULL DEFAULT NULL,
   `created_at`  TIMESTAMP       NULL DEFAULT NULL,
   `updated_at`  TIMESTAMP       NULL DEFAULT NULL,
-  PRIMARY KEY (`id`),
+  PRIMARY KEY (`domain_id`),
   UNIQUE KEY `domains_domain_unique` (`domain`),
   KEY `domains_tenant_id_fk` (`tenant_id`),
   CONSTRAINT `domains_tenant_id_foreign`
@@ -219,7 +219,7 @@ CREATE TABLE `invoices` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 CREATE TABLE `payment_methods` (
-  `payment_method_id` TINYINT         NOT NULL,
+  `payment_method_id` CHAR(36)         NOT NULL,
   `code`              VARCHAR(50)     NOT NULL,
   `name_en`           VARCHAR(100)    NOT NULL,
   `name_ar`           VARCHAR(100)    NOT NULL,
@@ -236,7 +236,7 @@ CREATE TABLE `payments` (
   `invoice_id`        CHAR(36)        DEFAULT NULL,
   `amount`            DECIMAL(15,4)   NOT NULL DEFAULT 0.0000,
   `currency`          CHAR(3)         NOT NULL DEFAULT 'EGP',
-  `payment_method_id` TINYINT         DEFAULT NULL,
+  `payment_method_id` CHAR(36)         DEFAULT NULL,
   `status`            TINYINT         NOT NULL DEFAULT 1 COMMENT '1=pending | 2=success | 3=failed',
   `paid_at`           TIMESTAMP       NULL DEFAULT NULL,
   `created_at`        TIMESTAMP       NULL DEFAULT NULL,
@@ -259,7 +259,7 @@ CREATE TABLE `payment_transactions` (
   `tenant_id`              CHAR(36)        NOT NULL,
   `amount`                 DECIMAL(15,4)   NOT NULL DEFAULT 0.0000,
   `currency`               CHAR(3)         NOT NULL DEFAULT 'EGP',
-  `payment_method_id`      TINYINT         DEFAULT NULL,
+  `payment_method_id` CHAR(36)         DEFAULT NULL,
   `status`                 TINYINT         NOT NULL DEFAULT 1 COMMENT '1=pending | 2=success | 3=failed',
   `gateway_name`           VARCHAR(100)    DEFAULT NULL,
   `gateway_transaction_id` VARCHAR(255)    DEFAULT NULL,
@@ -313,7 +313,7 @@ CREATE TABLE `refunds` (
 --  CENTRAL · LEAD CAPTURE
 -- ─────────────────────────────────────────────────────────
 CREATE TABLE `contact_requests` (
-  `id`         CHAR(36)        NOT NULL,
+  `contact_request_id` CHAR(36)        NOT NULL,
   `name`       VARCHAR(255)    NOT NULL,
   `email`      VARCHAR(255)    NOT NULL,
   `phone`      VARCHAR(50)     DEFAULT NULL,
@@ -324,13 +324,13 @@ CREATE TABLE `contact_requests` (
   `handled_at` TIMESTAMP       NULL DEFAULT NULL,
   `created_at` TIMESTAMP       NULL DEFAULT NULL,
   `updated_at` TIMESTAMP       NULL DEFAULT NULL,
-  PRIMARY KEY (`id`),
+  PRIMARY KEY (`contact_request_id`),
   KEY `contact_requests_is_handled_idx` (`is_handled`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci
   COMMENT='Inbound contact form submissions from the marketing site.';
 
 CREATE TABLE `demo_requests` (
-  `id`           CHAR(36)        NOT NULL,
+  `demo_request_id` CHAR(36)        NOT NULL,
   `name`         VARCHAR(255)    NOT NULL,
   `email`        VARCHAR(255)    NOT NULL,
   `phone`        VARCHAR(50)     DEFAULT NULL,
@@ -342,7 +342,7 @@ CREATE TABLE `demo_requests` (
   `handled_at`   TIMESTAMP       NULL DEFAULT NULL,
   `created_at`   TIMESTAMP       NULL DEFAULT NULL,
   `updated_at`   TIMESTAMP       NULL DEFAULT NULL,
-  PRIMARY KEY (`id`),
+  PRIMARY KEY (`demo_request_id`),
   KEY `demo_requests_is_handled_idx` (`is_handled`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci
   COMMENT='Demo booking requests from the marketing site.';
@@ -351,7 +351,7 @@ CREATE TABLE `demo_requests` (
 --  CENTRAL · PLATFORM NOTIFICATIONS
 -- ─────────────────────────────────────────────────────────
 CREATE TABLE `platform_notifications` (
-  `id`           CHAR(36)        NOT NULL,
+  `platform_notification_id` CHAR(36)        NOT NULL,
   `title_en`     VARCHAR(255)    NOT NULL,
   `title_ar`     VARCHAR(255)    NOT NULL,
   `body_en`      TEXT            NOT NULL,
@@ -363,20 +363,20 @@ CREATE TABLE `platform_notifications` (
   `created_by`   CHAR(36)        DEFAULT NULL COMMENT 'platform_users.id',
   `created_at`   TIMESTAMP       NULL DEFAULT NULL,
   `updated_at`   TIMESTAMP       NULL DEFAULT NULL,
-  PRIMARY KEY (`id`),
+  PRIMARY KEY (`platform_notification_id`),
   KEY `pn_type_idx` (`type`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci
   COMMENT='Cross-tenant platform announcements (maintenance windows, feature releases).';
 
 CREATE TABLE `platform_notification_targets` (
-  `id`                       CHAR(36)        NOT NULL,
+  `platform_notification_target_id` CHAR(36)        NOT NULL,
   `platform_notification_id` CHAR(36)        NOT NULL,
   `tenant_id`                CHAR(36)        NOT NULL,
   `status`                   TINYINT         NOT NULL DEFAULT 1 COMMENT '1=pending | 2=delivered | 3=read',
   `delivered_at`             TIMESTAMP       NULL DEFAULT NULL,
   `read_at`                  TIMESTAMP       NULL DEFAULT NULL,
   `created_at`               TIMESTAMP       NULL DEFAULT NULL,
-  PRIMARY KEY (`id`),
+  PRIMARY KEY (`platform_notification_target_id`),
   UNIQUE KEY `pnt_notification_tenant_unique` (`platform_notification_id`, `tenant_id`),
   KEY `pnt_tenant_status_idx`            (`tenant_id`, `status`),
   CONSTRAINT `pnt_notification_foreign`
@@ -390,7 +390,7 @@ CREATE TABLE `platform_notification_targets` (
 --  CENTRAL · AUDIT LOG
 -- ─────────────────────────────────────────────────────────
 CREATE TABLE `audit_logs` (
-  `id`           CHAR(36)        NOT NULL,
+  `audit_log_id` CHAR(36)        NOT NULL,
   `actor_type`   VARCHAR(50)     NOT NULL DEFAULT 'platform_user' COMMENT 'platform_user | system',
   `actor_id`     CHAR(36)        DEFAULT NULL COMMENT 'platform_users.id',
   `tenant_id`    CHAR(36)        DEFAULT NULL COMMENT 'NULL = platform-level event',
@@ -400,7 +400,7 @@ CREATE TABLE `audit_logs` (
   `properties`   JSON            DEFAULT NULL COMMENT 'Before/after diff',
   `ip_address`   VARCHAR(45)     DEFAULT NULL,
   `created_at`   TIMESTAMP       NULL DEFAULT NULL,
-  PRIMARY KEY (`id`),
+  PRIMARY KEY (`audit_log_id`),
   KEY `audit_logs_tenant_idx` (`tenant_id`),
   KEY `audit_logs_event_idx`  (`event`),
   KEY `audit_logs_actor_idx`  (`actor_id`)
@@ -411,7 +411,7 @@ CREATE TABLE `audit_logs` (
 --  TENANT SETTINGS (one row per tenant)
 -- ─────────────────────────────────────────────────────────
 CREATE TABLE `tenant_settings` (
-  `id`                               CHAR(36)        NOT NULL,
+  `tenant_setting_id` CHAR(36)        NOT NULL,
   `tenant_id`                        CHAR(36)        NOT NULL,
   -- branding
   `logo`                             VARCHAR(500)    DEFAULT NULL,
@@ -451,7 +451,7 @@ CREATE TABLE `tenant_settings` (
   `invoice_footer_note`              TEXT            DEFAULT NULL,
   `created_at`                       TIMESTAMP       NULL DEFAULT NULL,
   `updated_at`                       TIMESTAMP       NULL DEFAULT NULL,
-  PRIMARY KEY (`id`),
+  PRIMARY KEY (`tenant_setting_id`),
   UNIQUE KEY `tenant_settings_tenant_id_unique` (`tenant_id`),
   CONSTRAINT `tenant_settings_tenant_id_foreign`
     FOREIGN KEY (`tenant_id`) REFERENCES `tenants` (`id`) ON DELETE CASCADE
@@ -464,23 +464,23 @@ CREATE TABLE `tenant_settings` (
 -- ============================================================
 
 CREATE TABLE `governorates` (
-  `id`                  CHAR(36)        NOT NULL,
+  `governorate_id` CHAR(36)        NOT NULL,
   `governorate_name_ar` VARCHAR(255)    NOT NULL,
   `governorate_name_en` VARCHAR(255)    NOT NULL,
   `created_at`          TIMESTAMP       NULL DEFAULT NULL,
   `updated_at`          TIMESTAMP       NULL DEFAULT NULL,
-  PRIMARY KEY (`id`)
+  PRIMARY KEY (`governorate_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci
   COMMENT='Egyptian governorates. Shared reference — no tenant_id.';
 
 CREATE TABLE `cities` (
-  `id`             CHAR(36)        NOT NULL,
+  `city_id` CHAR(36)        NOT NULL,
   `governorate_id` CHAR(36)        NOT NULL,
   `city_name_ar`   VARCHAR(255)    NOT NULL,
   `city_name_en`   VARCHAR(255)    NOT NULL,
   `created_at`     TIMESTAMP       NULL DEFAULT NULL,
   `updated_at`     TIMESTAMP       NULL DEFAULT NULL,
-  PRIMARY KEY (`id`),
+  PRIMARY KEY (`city_id`),
   KEY `cities_governorate_id_fk` (`governorate_id`),
   CONSTRAINT `cities_governorate_id_foreign`
     FOREIGN KEY (`governorate_id`) REFERENCES `governorates` (`id`) ON DELETE CASCADE
@@ -492,7 +492,7 @@ CREATE TABLE `cities` (
 -- ============================================================
 
 CREATE TABLE `branches` (
-  `id`                CHAR(36)        NOT NULL,
+  `branch_id` CHAR(36)        NOT NULL,
   `tenant_id`         CHAR(36)        NOT NULL,
   `name_en`           VARCHAR(255)    NOT NULL,
   `name_ar`           VARCHAR(255)    NOT NULL,
@@ -508,7 +508,7 @@ CREATE TABLE `branches` (
   `created_at`        TIMESTAMP       NULL DEFAULT NULL,
   `updated_at`        TIMESTAMP       NULL DEFAULT NULL,
   `deleted_at`        TIMESTAMP       NULL DEFAULT NULL,
-  PRIMARY KEY (`id`),
+  PRIMARY KEY (`branch_id`),
   KEY `branches_tenant_id_idx`     (`tenant_id`),
   KEY `branches_governorate_id_fk` (`governorate_id`),
   KEY `branches_city_id_fk`        (`city_id`),
@@ -522,7 +522,7 @@ CREATE TABLE `branches` (
   COMMENT='Physical branches / locations per tenant.';
 
 CREATE TABLE `users` (
-  `id`            CHAR(36)        NOT NULL,
+  `user_id` CHAR(36)        NOT NULL,
   `tenant_id`     CHAR(36)        NOT NULL,
   `branch_id`     CHAR(36)        DEFAULT NULL COMMENT 'Default/home branch',
   `name`          VARCHAR(255)    NOT NULL,
@@ -538,7 +538,7 @@ CREATE TABLE `users` (
   `created_at`    TIMESTAMP       NULL DEFAULT NULL,
   `updated_at`    TIMESTAMP       NULL DEFAULT NULL,
   `deleted_at`    TIMESTAMP       NULL DEFAULT NULL,
-  PRIMARY KEY (`id`),
+  PRIMARY KEY (`user_id`),
   UNIQUE KEY `users_tenant_username_unique` (`tenant_id`, `username`),
   UNIQUE KEY `users_tenant_email_unique`    (`tenant_id`, `email`),
   KEY `users_tenant_id_idx`     (`tenant_id`),
@@ -550,12 +550,12 @@ CREATE TABLE `users` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 CREATE TABLE `password_resets` (
-  `id`         CHAR(36)        NOT NULL,
+  `password_reset_id` CHAR(36)        NOT NULL,
   `email`      VARCHAR(255)    NOT NULL,
   `token`      VARCHAR(255)    NOT NULL,
   `created_at` TIMESTAMP       NULL DEFAULT NULL,
   `expires_at` TIMESTAMP       NULL DEFAULT NULL,
-  PRIMARY KEY (`id`),
+  PRIMARY KEY (`password_reset_id`),
   KEY `password_resets_email_idx` (`email`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci
   COMMENT='Password reset tokens. JWT is stateless; no server-session table needed.';
@@ -579,7 +579,7 @@ CREATE TABLE `user_branches` (
 -- ============================================================
 
 CREATE TABLE `roles` (
-  `id`             CHAR(36)        NOT NULL,
+  `role_id` CHAR(36)        NOT NULL,
   `tenant_id`      CHAR(36)        NOT NULL,
   `name_en`        VARCHAR(255)    NOT NULL,
   `name_ar`        VARCHAR(255)    NOT NULL,
@@ -592,7 +592,7 @@ CREATE TABLE `roles` (
   `created_at`     TIMESTAMP       NULL DEFAULT NULL,
   `updated_at`     TIMESTAMP       NULL DEFAULT NULL,
   `deleted_at`     TIMESTAMP       NULL DEFAULT NULL,
-  PRIMARY KEY (`id`),
+  PRIMARY KEY (`role_id`),
   UNIQUE KEY `roles_tenant_name_guard_unique` (`tenant_id`, `name_en`, `guard_name`),
   KEY `roles_tenant_id_idx` (`tenant_id`),
   CONSTRAINT `roles_tenant_id_foreign`
@@ -601,7 +601,7 @@ CREATE TABLE `roles` (
   COMMENT='Spatie roles scoped per tenant.';
 
 CREATE TABLE `permissions` (
-  `id`             CHAR(36)        NOT NULL,
+  `permission_id` CHAR(36)        NOT NULL,
   `tenant_id`      CHAR(36)        NOT NULL DEFAULT 'central' COMMENT 'central = global default; else tenant-specific',
   `name_en`        VARCHAR(255)    NOT NULL COMMENT 'e.g. contact.create | sale.delete',
   `name_ar`        VARCHAR(255)    NOT NULL,
@@ -613,7 +613,7 @@ CREATE TABLE `permissions` (
   `description_ar` VARCHAR(500)    DEFAULT NULL,
   `created_at`     TIMESTAMP       NULL DEFAULT NULL,
   `updated_at`     TIMESTAMP       NULL DEFAULT NULL,
-  PRIMARY KEY (`id`),
+  PRIMARY KEY (`permission_id`),
   UNIQUE KEY `permissions_tenant_name_guard_unique` (`tenant_id`, `name_en`, `guard_name`),
   KEY `permissions_tenant_id_idx` (`tenant_id`),
   KEY `permissions_module_idx`    (`module`)
@@ -621,12 +621,12 @@ CREATE TABLE `permissions` (
   COMMENT='Per-tenant permission definitions. tenant_id=central for global defaults seeded on provisioning.';
 
 CREATE TABLE `role_has_permissions` (
-  `id`            CHAR(36)        NOT NULL,
+  `role_has_permission_id` CHAR(36)        NOT NULL,
   `tenant_id`     CHAR(36)        NOT NULL,
   `permission_id` CHAR(36)        NOT NULL,
   `role_id`       CHAR(36)        NOT NULL,
   `created_at`    TIMESTAMP       NULL DEFAULT NULL,
-  PRIMARY KEY (`id`),
+  PRIMARY KEY (`role_has_permission_id`),
   UNIQUE KEY `rhp_tenant_role_permission_unique` (`tenant_id`, `role_id`, `permission_id`),
   KEY `rhp_role_id_fk`       (`role_id`),
   KEY `rhp_permission_id_fk` (`permission_id`),
@@ -637,13 +637,13 @@ CREATE TABLE `role_has_permissions` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 CREATE TABLE `model_has_roles` (
-  `id`         CHAR(36)        NOT NULL,
+  `model_has_role_id` CHAR(36)        NOT NULL,
   `role_id`    CHAR(36)        NOT NULL,
   `model_type` VARCHAR(255)    NOT NULL,
   `model_id`   CHAR(36)        NOT NULL,
   `tenant_id`  CHAR(36)        NOT NULL,
   `created_at` TIMESTAMP       NULL DEFAULT NULL,
-  PRIMARY KEY (`id`),
+  PRIMARY KEY (`model_has_role_id`),
   UNIQUE KEY `mhr_model_role_tenant_unique` (`model_id`, `model_type`, `role_id`, `tenant_id`),
   KEY `mhr_role_id_fk`        (`role_id`),
   KEY `mhr_tenant_model_idx`  (`tenant_id`, `model_id`, `model_type`),
@@ -652,13 +652,13 @@ CREATE TABLE `model_has_roles` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 CREATE TABLE `model_has_permissions` (
-  `id`            CHAR(36)        NOT NULL,
+  `model_has_permission_id` CHAR(36)        NOT NULL,
   `permission_id` CHAR(36)        NOT NULL,
   `model_type`    VARCHAR(255)    NOT NULL,
   `model_id`      CHAR(36)        NOT NULL,
   `tenant_id`     CHAR(36)        NOT NULL,
   `created_at`    TIMESTAMP       NULL DEFAULT NULL,
-  PRIMARY KEY (`id`),
+  PRIMARY KEY (`model_has_permission_id`),
   UNIQUE KEY `mhp_model_permission_tenant_unique` (`model_id`, `model_type`, `permission_id`, `tenant_id`),
   KEY `mhp_permission_id_fk`   (`permission_id`),
   KEY `mhp_tenant_model_idx`   (`tenant_id`, `model_id`, `model_type`),
@@ -672,14 +672,14 @@ CREATE TABLE `model_has_permissions` (
 -- ============================================================
 
 CREATE TABLE `activity_types` (
-  `id`         CHAR(36)        NOT NULL,
+  `activity_type_id` CHAR(36)        NOT NULL,
   `tenant_id`  CHAR(36)        NOT NULL,
   `name_en`    VARCHAR(255)    NOT NULL,
   `name_ar`    VARCHAR(255)    NOT NULL,
   `created_at` TIMESTAMP       NULL DEFAULT NULL,
   `updated_at` TIMESTAMP       NULL DEFAULT NULL,
   `deleted_at` TIMESTAMP       NULL DEFAULT NULL,
-  PRIMARY KEY (`id`),
+  PRIMARY KEY (`activity_type_id`),
   KEY `activity_types_tenant_id_idx` (`tenant_id`),
   CONSTRAINT `activity_types_tenant_id_foreign`
     FOREIGN KEY (`tenant_id`) REFERENCES `tenants` (`id`) ON DELETE CASCADE
@@ -687,7 +687,7 @@ CREATE TABLE `activity_types` (
   COMMENT='Business activity types per tenant (e.g. Retail, Wholesale, Pharmacy).';
 
 CREATE TABLE `sales_segments` (
-  `id`             CHAR(36)        NOT NULL,
+  `sales_segment_id` CHAR(36)        NOT NULL,
   `tenant_id`      CHAR(36)        NOT NULL,
   `name_en`        VARCHAR(255)    NOT NULL,
   `name_ar`        VARCHAR(255)    NOT NULL,
@@ -696,21 +696,21 @@ CREATE TABLE `sales_segments` (
   `created_at`     TIMESTAMP       NULL DEFAULT NULL,
   `updated_at`     TIMESTAMP       NULL DEFAULT NULL,
   `deleted_at`     TIMESTAMP       NULL DEFAULT NULL,
-  PRIMARY KEY (`id`),
+  PRIMARY KEY (`sales_segment_id`),
   KEY `sales_segments_tenant_id_idx` (`tenant_id`),
   CONSTRAINT `sales_segments_tenant_id_foreign`
     FOREIGN KEY (`tenant_id`) REFERENCES `tenants` (`id`) ON DELETE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 CREATE TABLE `contact_groups` (
-  `id`         CHAR(36)        NOT NULL,
+  `contact_group_id` CHAR(36)        NOT NULL,
   `tenant_id`  CHAR(36)        NOT NULL,
   `name_en`    VARCHAR(255)    NOT NULL,
   `name_ar`    VARCHAR(255)    NOT NULL,
   `created_at` TIMESTAMP       NULL DEFAULT NULL,
   `updated_at` TIMESTAMP       NULL DEFAULT NULL,
   `deleted_at` TIMESTAMP       NULL DEFAULT NULL,
-  PRIMARY KEY (`id`),
+  PRIMARY KEY (`contact_group_id`),
   KEY `contact_groups_tenant_id_idx` (`tenant_id`),
   CONSTRAINT `contact_groups_tenant_id_foreign`
     FOREIGN KEY (`tenant_id`) REFERENCES `tenants` (`id`) ON DELETE CASCADE
@@ -718,7 +718,7 @@ CREATE TABLE `contact_groups` (
   COMMENT='Customer/supplier grouping tags.';
 
 CREATE TABLE `contacts` (
-  `id`               CHAR(36)        NOT NULL,
+  `contact_id` CHAR(36)        NOT NULL,
   `tenant_id`        CHAR(36)        NOT NULL,
   `type`             TINYINT         NOT NULL DEFAULT 1 COMMENT '1=customer | 2=supplier | 3=both',
   `name_en`          VARCHAR(255)    NOT NULL,
@@ -749,7 +749,7 @@ CREATE TABLE `contacts` (
   `created_at`       TIMESTAMP       NULL DEFAULT NULL,
   `updated_at`       TIMESTAMP       NULL DEFAULT NULL,
   `deleted_at`       TIMESTAMP       NULL DEFAULT NULL,
-  PRIMARY KEY (`id`),
+  PRIMARY KEY (`contact_id`),
   UNIQUE KEY `contacts_contact_code_tenant_unique` (`tenant_id`, `contact_code`),
   UNIQUE KEY `contacts_email_tenant_unique`         (`tenant_id`, `email`),
   KEY `contacts_tenant_type_idx`      (`tenant_id`, `type`),
@@ -778,7 +778,7 @@ CREATE TABLE `contacts` (
   COMMENT='Unified customers & suppliers.';
 
 CREATE TABLE `contact_notes` (
-  `id`         CHAR(36)        NOT NULL,
+  `contact_note_id` CHAR(36)        NOT NULL,
   `tenant_id`  CHAR(36)        NOT NULL,
   `contact_id` CHAR(36)        NOT NULL,
   `note`       TEXT            NOT NULL,
@@ -786,7 +786,7 @@ CREATE TABLE `contact_notes` (
   `created_at` TIMESTAMP       NULL DEFAULT NULL,
   `updated_at` TIMESTAMP       NULL DEFAULT NULL,
   `deleted_at` TIMESTAMP       NULL DEFAULT NULL,
-  PRIMARY KEY (`id`),
+  PRIMARY KEY (`contact_note_id`),
   KEY `contact_notes_tenant_contact_idx` (`tenant_id`, `contact_id`),
   KEY `contact_notes_created_by_fk`      (`created_by`),
   CONSTRAINT `contact_notes_tenant_id_foreign`
@@ -798,7 +798,7 @@ CREATE TABLE `contact_notes` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 CREATE TABLE `contact_addresses` (
-  `id`             CHAR(36)        NOT NULL,
+  `contact_address_id` CHAR(36)        NOT NULL,
   `tenant_id`      CHAR(36)        NOT NULL,
   `contact_id`     CHAR(36)        NOT NULL,
   `label`          VARCHAR(100)    DEFAULT NULL COMMENT 'e.g. warehouse | headquarters | branch',
@@ -811,7 +811,7 @@ CREATE TABLE `contact_addresses` (
   `created_at`     TIMESTAMP       NULL DEFAULT NULL,
   `updated_at`     TIMESTAMP       NULL DEFAULT NULL,
   `deleted_at`     TIMESTAMP       NULL DEFAULT NULL,
-  PRIMARY KEY (`id`),
+  PRIMARY KEY (`contact_address_id`),
   KEY `contact_addresses_tenant_contact_idx` (`tenant_id`, `contact_id`),
   CONSTRAINT `ca_tenant_id_foreign`
     FOREIGN KEY (`tenant_id`)      REFERENCES `tenants`      (`id`) ON DELETE CASCADE,
@@ -829,21 +829,21 @@ CREATE TABLE `contact_addresses` (
 -- ============================================================
 
 CREATE TABLE `brands` (
-  `id`         CHAR(36)        NOT NULL,
+  `brand_id` CHAR(36)        NOT NULL,
   `tenant_id`  CHAR(36)        NOT NULL,
   `name_en`    VARCHAR(255)    NOT NULL,
   `name_ar`    VARCHAR(255)    NOT NULL,
   `created_at` TIMESTAMP       NULL DEFAULT NULL,
   `updated_at` TIMESTAMP       NULL DEFAULT NULL,
   `deleted_at` TIMESTAMP       NULL DEFAULT NULL,
-  PRIMARY KEY (`id`),
+  PRIMARY KEY (`brand_id`),
   KEY `brands_tenant_id_idx` (`tenant_id`),
   CONSTRAINT `brands_tenant_id_foreign`
     FOREIGN KEY (`tenant_id`) REFERENCES `tenants` (`id`) ON DELETE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 CREATE TABLE `categories` (
-  `id`         CHAR(36)        NOT NULL,
+  `category_id` CHAR(36)        NOT NULL,
   `tenant_id`  CHAR(36)        NOT NULL,
   `parent_id`  CHAR(36)        DEFAULT NULL COMMENT 'NULL = top-level category',
   `name_en`    VARCHAR(255)    NOT NULL,
@@ -852,7 +852,7 @@ CREATE TABLE `categories` (
   `created_at` TIMESTAMP       NULL DEFAULT NULL,
   `updated_at` TIMESTAMP       NULL DEFAULT NULL,
   `deleted_at` TIMESTAMP       NULL DEFAULT NULL,
-  PRIMARY KEY (`id`),
+  PRIMARY KEY (`category_id`),
   KEY `categories_tenant_id_idx` (`tenant_id`),
   KEY `categories_parent_id_fk`  (`parent_id`),
   CONSTRAINT `categories_tenant_id_foreign`
@@ -862,7 +862,7 @@ CREATE TABLE `categories` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 CREATE TABLE `units` (
-  `id`                   CHAR(36)        NOT NULL,
+  `unit_id` CHAR(36)        NOT NULL,
   `tenant_id`            CHAR(36)        NOT NULL,
   `actual_name_en`       VARCHAR(255)    NOT NULL,
   `actual_name_ar`       VARCHAR(255)    NOT NULL,
@@ -874,7 +874,7 @@ CREATE TABLE `units` (
   `created_at`           TIMESTAMP       NULL DEFAULT NULL,
   `updated_at`           TIMESTAMP       NULL DEFAULT NULL,
   `deleted_at`           TIMESTAMP       NULL DEFAULT NULL,
-  PRIMARY KEY (`id`),
+  PRIMARY KEY (`unit_id`),
   KEY `units_tenant_id_idx`    (`tenant_id`),
   KEY `units_base_unit_id_fk`  (`base_unit_id`),
   CONSTRAINT `units_tenant_id_foreign`
@@ -884,7 +884,7 @@ CREATE TABLE `units` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 CREATE TABLE `products` (
-  `id`               CHAR(36)        NOT NULL,
+  `product_id` CHAR(36)        NOT NULL,
   `tenant_id`        CHAR(36)        NOT NULL,
   `name_en`          VARCHAR(255)    NOT NULL,
   `name_ar`          VARCHAR(255)    NOT NULL,
@@ -912,7 +912,7 @@ CREATE TABLE `products` (
   `created_at`       TIMESTAMP       NULL DEFAULT NULL,
   `updated_at`       TIMESTAMP       NULL DEFAULT NULL,
   `deleted_at`       TIMESTAMP       NULL DEFAULT NULL,
-  PRIMARY KEY (`id`),
+  PRIMARY KEY (`product_id`),
   KEY `products_tenant_id_idx`       (`tenant_id`),
   KEY `products_tenant_sku_idx`      (`tenant_id`, `sku`),
   KEY `products_tenant_barcode_idx`  (`tenant_id`, `barcode`),
@@ -939,7 +939,7 @@ CREATE TABLE `products` (
 --  Product variants (for type=variable products)
 -- ─────────────────────────────────────────────────────────
 CREATE TABLE `product_variants` (
-  `id`             CHAR(36)        NOT NULL,
+  `product_variant_id` CHAR(36)        NOT NULL,
   `tenant_id`      CHAR(36)        NOT NULL,
   `product_id`     CHAR(36)        NOT NULL,
   `name_en`        VARCHAR(255)    NOT NULL COMMENT 'e.g. Red / Large',
@@ -952,7 +952,7 @@ CREATE TABLE `product_variants` (
   `created_at`     TIMESTAMP       NULL DEFAULT NULL,
   `updated_at`     TIMESTAMP       NULL DEFAULT NULL,
   `deleted_at`     TIMESTAMP       NULL DEFAULT NULL,
-  PRIMARY KEY (`id`),
+  PRIMARY KEY (`product_variant_id`),
   KEY `pv_tenant_product_idx`  (`tenant_id`, `product_id`),
   KEY `pv_tenant_sku_idx`      (`tenant_id`, `sku`),
   KEY `pv_product_id_fk`       (`product_id`),
@@ -964,7 +964,7 @@ CREATE TABLE `product_variants` (
   COMMENT='Variants for variable products (e.g. colour/size combinations).';
 
 CREATE TABLE `product_unit_details` (
-  `id`             CHAR(36)        NOT NULL,
+  `product_unit_detail_id` CHAR(36)        NOT NULL,
   `tenant_id`      CHAR(36)        NOT NULL,
   `product_id`     CHAR(36)        NOT NULL,
   `unit_id`        CHAR(36)        NOT NULL,
@@ -973,7 +973,7 @@ CREATE TABLE `product_unit_details` (
   `created_at`     TIMESTAMP       NULL DEFAULT NULL,
   `updated_at`     TIMESTAMP       NULL DEFAULT NULL,
   `deleted_at`     TIMESTAMP       NULL DEFAULT NULL,
-  PRIMARY KEY (`id`),
+  PRIMARY KEY (`product_unit_detail_id`),
   UNIQUE KEY `pud_product_unit_unique` (`tenant_id`, `product_id`, `unit_id`),
   KEY `pud_product_id_fk` (`product_id`),
   KEY `pud_unit_id_fk`    (`unit_id`),
@@ -987,7 +987,7 @@ CREATE TABLE `product_unit_details` (
   COMMENT='Per-unit pricing per product.';
 
 CREATE TABLE `product_price_histories` (
-  `id`             CHAR(36)        NOT NULL,
+  `product_price_history_id` CHAR(36)        NOT NULL,
   `tenant_id`      CHAR(36)        NOT NULL,
   `product_id`     CHAR(36)        NOT NULL,
   `unit_id`        CHAR(36)        NOT NULL,
@@ -995,7 +995,7 @@ CREATE TABLE `product_price_histories` (
   `new_unit_price` DECIMAL(15,4)   NOT NULL,
   `changed_by`     CHAR(36)        NOT NULL,
   `created_at`     TIMESTAMP       NULL DEFAULT NULL,
-  PRIMARY KEY (`id`),
+  PRIMARY KEY (`product_price_history_id`),
   KEY `pph_tenant_product_idx` (`tenant_id`, `product_id`),
   KEY `pph_product_id_fk`      (`product_id`),
   KEY `pph_changed_by_fk`      (`changed_by`),
@@ -1009,7 +1009,7 @@ CREATE TABLE `product_price_histories` (
   COMMENT='Price change audit log per product+unit.';
 
 CREATE TABLE `sales_segment_products` (
-  `id`               CHAR(36)        NOT NULL,
+  `sales_segment_product_id` CHAR(36)        NOT NULL,
   `tenant_id`        CHAR(36)        NOT NULL,
   `sales_segment_id` CHAR(36)        NOT NULL,
   `product_id`       CHAR(36)        NOT NULL,
@@ -1018,7 +1018,7 @@ CREATE TABLE `sales_segment_products` (
   `created_at`       TIMESTAMP       NULL DEFAULT NULL,
   `updated_at`       TIMESTAMP       NULL DEFAULT NULL,
   `deleted_at`       TIMESTAMP       NULL DEFAULT NULL,
-  PRIMARY KEY (`id`),
+  PRIMARY KEY (`sales_segment_product_id`),
   UNIQUE KEY `ssp_segment_product_unit_unique` (`tenant_id`, `sales_segment_id`, `product_id`, `unit_id`),
   KEY `ssp_sales_segment_id_fk` (`sales_segment_id`),
   KEY `ssp_product_id_fk`       (`product_id`),
@@ -1035,7 +1035,7 @@ CREATE TABLE `sales_segment_products` (
   COMMENT='Segment-specific product pricing.';
 
 CREATE TABLE `serial_numbers` (
-  `id`                     CHAR(36)        NOT NULL,
+  `serial_number_id` CHAR(36)        NOT NULL,
   `tenant_id`              CHAR(36)        NOT NULL,
   `product_id`             CHAR(36)        NOT NULL,
   `warehouse_id`           CHAR(36)        DEFAULT NULL COMMENT 'Deferred FK → warehouses',
@@ -1046,7 +1046,7 @@ CREATE TABLE `serial_numbers` (
   `created_at`             TIMESTAMP       NULL DEFAULT NULL,
   `updated_at`             TIMESTAMP       NULL DEFAULT NULL,
   `deleted_at`             TIMESTAMP       NULL DEFAULT NULL,
-  PRIMARY KEY (`id`),
+  PRIMARY KEY (`serial_number_id`),
   UNIQUE KEY `serial_numbers_tenant_serial_unique` (`tenant_id`, `serial_no`),
   KEY `sn_tenant_product_idx` (`tenant_id`, `product_id`),
   KEY `sn_warehouse_id_fk`    (`warehouse_id`),
@@ -1058,7 +1058,7 @@ CREATE TABLE `serial_numbers` (
   COMMENT='Serial numbers for is_serialized products. One row per physical unit.';
 
 CREATE TABLE `batch_numbers` (
-  `id`               CHAR(36)        NOT NULL,
+  `batch_number_id` CHAR(36)        NOT NULL,
   `tenant_id`        CHAR(36)        NOT NULL,
   `product_id`       CHAR(36)        NOT NULL,
   `warehouse_id`     CHAR(36)        DEFAULT NULL COMMENT 'Deferred FK → warehouses',
@@ -1072,7 +1072,7 @@ CREATE TABLE `batch_numbers` (
   `created_at`       TIMESTAMP       NULL DEFAULT NULL,
   `updated_at`       TIMESTAMP       NULL DEFAULT NULL,
   `deleted_at`       TIMESTAMP       NULL DEFAULT NULL,
-  PRIMARY KEY (`id`),
+  PRIMARY KEY (`batch_number_id`),
   UNIQUE KEY `batch_numbers_tenant_product_batch_unique` (`tenant_id`, `product_id`, `batch_no`),
   KEY `bn_tenant_product_idx` (`tenant_id`, `product_id`),
   KEY `bn_expiry_idx`         (`tenant_id`, `expiry_date`),
@@ -1088,7 +1088,7 @@ CREATE TABLE `batch_numbers` (
 --  CUSTOM MEDIA MODULE
 -- ─────────────────────────────────────────────────────────
 CREATE TABLE `media_files` (
-  `id`            CHAR(36)        NOT NULL,
+  `media_file_id` CHAR(36)        NOT NULL,
   `tenant_id`     CHAR(36)        NOT NULL,
   `model_type`    VARCHAR(255)    NOT NULL COMMENT 'contact | product | purchase_order | expense | employee | user | tenant',
   `model_id`      CHAR(36)        NOT NULL,
@@ -1104,7 +1104,7 @@ CREATE TABLE `media_files` (
   `created_at`    TIMESTAMP       NULL DEFAULT NULL,
   `updated_at`    TIMESTAMP       NULL DEFAULT NULL,
   `deleted_at`    TIMESTAMP       NULL DEFAULT NULL,
-  PRIMARY KEY (`id`),
+  PRIMARY KEY (`media_file_id`),
   KEY `media_files_tenant_model_idx` (`tenant_id`, `model_type`, `model_id`),
   KEY `media_files_collection_idx`   (`tenant_id`, `collection`),
   KEY `media_files_created_by_fk`    (`created_by`),
@@ -1121,17 +1121,17 @@ CREATE TABLE `media_files` (
 -- ============================================================
 
 CREATE TABLE `account_types` (
-  `id`             CHAR(36)        NOT NULL,
+  `account_type_id` CHAR(36)        NOT NULL,
   `name_en`        VARCHAR(100)    NOT NULL COMMENT 'Asset | Liability | Equity | Revenue | Expense',
   `name_ar`        VARCHAR(100)    NOT NULL,
   `normal_balance` TINYINT         NOT NULL COMMENT '1=debit | 2=credit',
   `created_at`     TIMESTAMP       NULL DEFAULT NULL,
-  PRIMARY KEY (`id`)
+  PRIMARY KEY (`account_type_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci
   COMMENT='Double-entry account type definitions. Seeded globally, not per-tenant.';
 
 CREATE TABLE `accounts` (
-  `id`         CHAR(36)        NOT NULL,
+  `account_id` CHAR(36)        NOT NULL,
   `tenant_id`  CHAR(36)        NOT NULL,
   `name_en`    VARCHAR(255)    NOT NULL,
   `name_ar`    VARCHAR(255)    NOT NULL,
@@ -1141,7 +1141,7 @@ CREATE TABLE `accounts` (
   `created_at` TIMESTAMP       NULL DEFAULT NULL,
   `updated_at` TIMESTAMP       NULL DEFAULT NULL,
   `deleted_at` TIMESTAMP       NULL DEFAULT NULL,
-  PRIMARY KEY (`id`),
+  PRIMARY KEY (`account_id`),
   KEY `accounts_tenant_id_idx` (`tenant_id`),
   CONSTRAINT `accounts_tenant_id_foreign`
     FOREIGN KEY (`tenant_id`) REFERENCES `tenants` (`id`) ON DELETE CASCADE
@@ -1158,7 +1158,7 @@ ALTER TABLE `branches`
     FOREIGN KEY (`credit_account_id`) REFERENCES `accounts` (`id`) ON DELETE SET NULL;
 
 CREATE TABLE `chart_of_accounts` (
-  `id`              CHAR(36)        NOT NULL,
+  `chart_of_account_id` CHAR(36)        NOT NULL,
   `tenant_id`       CHAR(36)        NOT NULL,
   `parent_id`       CHAR(36)        DEFAULT NULL,
   `account_type_id` CHAR(36)        NOT NULL,
@@ -1173,7 +1173,7 @@ CREATE TABLE `chart_of_accounts` (
   `created_at`      TIMESTAMP       NULL DEFAULT NULL,
   `updated_at`      TIMESTAMP       NULL DEFAULT NULL,
   `deleted_at`      TIMESTAMP       NULL DEFAULT NULL,
-  PRIMARY KEY (`id`),
+  PRIMARY KEY (`chart_of_account_id`),
   UNIQUE KEY `coa_code_tenant_unique` (`tenant_id`, `code`),
   KEY `coa_tenant_id_idx`       (`tenant_id`),
   KEY `coa_parent_id_fk`        (`parent_id`),
@@ -1187,7 +1187,7 @@ CREATE TABLE `chart_of_accounts` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 CREATE TABLE `journal_entries` (
-  `id`             CHAR(36)        NOT NULL,
+  `journal_entry_id` CHAR(36)        NOT NULL,
   `tenant_id`      CHAR(36)        NOT NULL,
   `entry_number`   VARCHAR(100)    DEFAULT NULL,
   `entry_date`     DATE            NOT NULL,
@@ -1201,7 +1201,7 @@ CREATE TABLE `journal_entries` (
   `created_at`     TIMESTAMP       NULL DEFAULT NULL,
   `updated_at`     TIMESTAMP       NULL DEFAULT NULL,
   `deleted_at`     TIMESTAMP       NULL DEFAULT NULL,
-  PRIMARY KEY (`id`),
+  PRIMARY KEY (`journal_entry_id`),
   KEY `je_tenant_date_idx` (`tenant_id`, `entry_date`),
   KEY `je_reference_idx`   (`reference_type`, `reference_id`),
   KEY `je_posted_by_fk`    (`posted_by`),
@@ -1215,14 +1215,14 @@ CREATE TABLE `journal_entries` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 CREATE TABLE `journal_entry_lines` (
-  `id`               CHAR(36)        NOT NULL,
+  `journal_entry_line_id` CHAR(36)        NOT NULL,
   `journal_entry_id` CHAR(36)        NOT NULL,
   `account_id`       CHAR(36)        NOT NULL,
   `debit`            DECIMAL(15,4)   NOT NULL DEFAULT 0.0000,
   `credit`           DECIMAL(15,4)   NOT NULL DEFAULT 0.0000,
   `description`      VARCHAR(500)    DEFAULT NULL,
   `deleted_at`       TIMESTAMP       NULL DEFAULT NULL,
-  PRIMARY KEY (`id`),
+  PRIMARY KEY (`journal_entry_line_id`),
   KEY `jel_journal_entry_id_fk` (`journal_entry_id`),
   KEY `jel_account_id_fk`       (`account_id`),
   CONSTRAINT `jel_journal_entry_id_foreign`
@@ -1232,7 +1232,7 @@ CREATE TABLE `journal_entry_lines` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 CREATE TABLE `taxes` (
-  `id`         CHAR(36)        NOT NULL,
+  `tax_id` CHAR(36)        NOT NULL,
   `tenant_id`  CHAR(36)        NOT NULL,
   `name_en`    VARCHAR(100)    NOT NULL COMMENT 'e.g. VAT 14%, Withholding 5%',
   `name_ar`    VARCHAR(100)    NOT NULL,
@@ -1242,14 +1242,14 @@ CREATE TABLE `taxes` (
   `created_at` TIMESTAMP       NULL DEFAULT NULL,
   `updated_at` TIMESTAMP       NULL DEFAULT NULL,
   `deleted_at` TIMESTAMP       NULL DEFAULT NULL,
-  PRIMARY KEY (`id`),
+  PRIMARY KEY (`tax_id`),
   KEY `taxes_tenant_id_idx` (`tenant_id`),
   CONSTRAINT `taxes_tenant_id_foreign`
     FOREIGN KEY (`tenant_id`) REFERENCES `tenants` (`id`) ON DELETE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 CREATE TABLE `currencies` (
-  `id`              CHAR(36)        NOT NULL,
+  `currency_id` CHAR(36)        NOT NULL,
   `tenant_id`       CHAR(36)        NOT NULL,
   `code`            CHAR(3)         NOT NULL COMMENT 'ISO 4217 e.g. EGP | USD | EUR',
   `name_en`         VARCHAR(100)    NOT NULL,
@@ -1260,7 +1260,7 @@ CREATE TABLE `currencies` (
   `is_active`       TINYINT(1)      NOT NULL DEFAULT 1,
   `created_at`      TIMESTAMP       NULL DEFAULT NULL,
   `updated_at`      TIMESTAMP       NULL DEFAULT NULL,
-  PRIMARY KEY (`id`),
+  PRIMARY KEY (`currency_id`),
   UNIQUE KEY `currencies_tenant_code_unique` (`tenant_id`, `code`),
   KEY `currencies_tenant_id_idx` (`tenant_id`),
   CONSTRAINT `currencies_tenant_id_foreign`
@@ -1269,7 +1269,7 @@ CREATE TABLE `currencies` (
   COMMENT='Supported currencies per tenant with exchange rates.';
 
 CREATE TABLE `cost_centers` (
-  `id`         CHAR(36)        NOT NULL,
+  `cost_center_id` CHAR(36)        NOT NULL,
   `tenant_id`  CHAR(36)        NOT NULL,
   `parent_id`  CHAR(36)        DEFAULT NULL,
   `name_en`    VARCHAR(255)    NOT NULL,
@@ -1279,7 +1279,7 @@ CREATE TABLE `cost_centers` (
   `created_at` TIMESTAMP       NULL DEFAULT NULL,
   `updated_at` TIMESTAMP       NULL DEFAULT NULL,
   `deleted_at` TIMESTAMP       NULL DEFAULT NULL,
-  PRIMARY KEY (`id`),
+  PRIMARY KEY (`cost_center_id`),
   KEY `cost_centers_tenant_id_idx` (`tenant_id`),
   KEY `cost_centers_parent_id_fk`  (`parent_id`),
   CONSTRAINT `cost_centers_tenant_id_foreign`
@@ -1289,21 +1289,21 @@ CREATE TABLE `cost_centers` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 CREATE TABLE `expense_categories` (
-  `id`         CHAR(36)        NOT NULL,
+  `expense_category_id` CHAR(36)        NOT NULL,
   `tenant_id`  CHAR(36)        NOT NULL,
   `name_en`    VARCHAR(255)    NOT NULL,
   `name_ar`    VARCHAR(255)    NOT NULL,
   `created_at` TIMESTAMP       NULL DEFAULT NULL,
   `updated_at` TIMESTAMP       NULL DEFAULT NULL,
   `deleted_at` TIMESTAMP       NULL DEFAULT NULL,
-  PRIMARY KEY (`id`),
+  PRIMARY KEY (`expense_category_id`),
   KEY `expense_categories_tenant_id_idx` (`tenant_id`),
   CONSTRAINT `expense_categories_tenant_id_foreign`
     FOREIGN KEY (`tenant_id`) REFERENCES `tenants` (`id`) ON DELETE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 CREATE TABLE `expenses` (
-  `id`                  CHAR(36)        NOT NULL,
+  `expense_id` CHAR(36)        NOT NULL,
   `tenant_id`           CHAR(36)        NOT NULL,
   `expense_category_id` CHAR(36)        NOT NULL,
   `account_id`          CHAR(36)        NOT NULL,
@@ -1317,7 +1317,7 @@ CREATE TABLE `expenses` (
   `created_at`          TIMESTAMP       NULL DEFAULT NULL,
   `updated_at`          TIMESTAMP       NULL DEFAULT NULL,
   `deleted_at`          TIMESTAMP       NULL DEFAULT NULL,
-  PRIMARY KEY (`id`),
+  PRIMARY KEY (`expense_id`),
   KEY `expenses_tenant_id_idx`          (`tenant_id`),
   KEY `expenses_expense_category_id_fk` (`expense_category_id`),
   KEY `expenses_account_id_fk`          (`account_id`),
@@ -1342,13 +1342,13 @@ CREATE TABLE `expenses` (
 --  KEY-VALUE SETTINGS STORE  (module-level config per tenant)
 -- ─────────────────────────────────────────────────────────
 CREATE TABLE `settings` (
-  `id`         CHAR(36)        NOT NULL,
+  `setting_id` CHAR(36)        NOT NULL,
   `tenant_id`  CHAR(36)        NOT NULL,
   `key`        VARCHAR(150)    NOT NULL COMMENT 'format: module.setting_name — e.g. sales.invoice_prefix',
   `value`      TEXT            DEFAULT NULL,
   `created_at` TIMESTAMP       NULL DEFAULT NULL,
   `updated_at` TIMESTAMP       NULL DEFAULT NULL,
-  PRIMARY KEY (`id`),
+  PRIMARY KEY (`setting_id`),
   UNIQUE KEY `settings_tenant_key_unique` (`tenant_id`, `key`),
   KEY `settings_tenant_id_idx` (`tenant_id`),
   CONSTRAINT `settings_tenant_id_foreign`
@@ -1362,7 +1362,7 @@ CREATE TABLE `settings` (
 -- ============================================================
 
 CREATE TABLE `warehouses` (
-  `id`         CHAR(36)        NOT NULL,
+  `warehouse_id` CHAR(36)        NOT NULL,
   `tenant_id`  CHAR(36)        NOT NULL,
   `branch_id`  CHAR(36)        DEFAULT NULL,
   `name_en`    VARCHAR(255)    NOT NULL,
@@ -1374,7 +1374,7 @@ CREATE TABLE `warehouses` (
   `created_at` TIMESTAMP       NULL DEFAULT NULL,
   `updated_at` TIMESTAMP       NULL DEFAULT NULL,
   `deleted_at` TIMESTAMP       NULL DEFAULT NULL,
-  PRIMARY KEY (`id`),
+  PRIMARY KEY (`warehouse_id`),
   KEY `warehouses_tenant_id_idx` (`tenant_id`),
   KEY `warehouses_branch_id_fk`  (`branch_id`),
   CONSTRAINT `warehouses_tenant_id_foreign`
@@ -1393,7 +1393,7 @@ ALTER TABLE `batch_numbers`
     FOREIGN KEY (`warehouse_id`) REFERENCES `warehouses` (`id`) ON DELETE SET NULL;
 
 CREATE TABLE `stock_levels` (
-  `id`            CHAR(36)        NOT NULL,
+  `stock_level_id` CHAR(36)        NOT NULL,
   `tenant_id`     CHAR(36)        NOT NULL,
   `warehouse_id`  CHAR(36)        NOT NULL,
   `product_id`    CHAR(36)        NOT NULL,
@@ -1402,7 +1402,7 @@ CREATE TABLE `stock_levels` (
   `qty_reserved`  DECIMAL(15,4)   NOT NULL DEFAULT 0.0000 COMMENT 'Reserved by pending orders',
   `qty_on_order`  DECIMAL(15,4)   NOT NULL DEFAULT 0.0000 COMMENT 'In open purchase orders',
   `updated_at`    TIMESTAMP       NULL DEFAULT NULL,
-  PRIMARY KEY (`id`),
+  PRIMARY KEY (`stock_level_id`),
   UNIQUE KEY `stock_levels_unique` (`tenant_id`, `warehouse_id`, `product_id`, `unit_id`),
   KEY `stock_levels_tenant_product_idx` (`tenant_id`, `product_id`),
   KEY `stock_levels_warehouse_id_fk`    (`warehouse_id`),
@@ -1420,7 +1420,7 @@ CREATE TABLE `stock_levels` (
   COMMENT='Real-time stock snapshot per warehouse/product/unit.';
 
 CREATE TABLE `stock_movements` (
-  `id`             CHAR(36)        NOT NULL,
+  `stock_movement_id` CHAR(36)        NOT NULL,
   `tenant_id`      CHAR(36)        NOT NULL,
   `warehouse_id`   CHAR(36)        NOT NULL,
   `product_id`     CHAR(36)        NOT NULL,
@@ -1436,7 +1436,7 @@ CREATE TABLE `stock_movements` (
   `note`           TEXT            DEFAULT NULL,
   `created_by`     CHAR(36)        DEFAULT NULL,
   `created_at`     TIMESTAMP       NULL DEFAULT NULL,
-  PRIMARY KEY (`id`),
+  PRIMARY KEY (`stock_movement_id`),
   KEY `sm_tenant_product_idx` (`tenant_id`, `product_id`),
   KEY `sm_tenant_date_idx`    (`tenant_id`, `created_at`),
   KEY `sm_reference_idx`      (`reference_type`, `reference_id`),
@@ -1462,7 +1462,7 @@ CREATE TABLE `stock_movements` (
   COMMENT='Append-only stock ledger. Never UPDATE or DELETE rows.';
 
 CREATE TABLE `stock_adjustments` (
-  `id`           CHAR(36)        NOT NULL,
+  `stock_adjustment_id` CHAR(36)        NOT NULL,
   `tenant_id`    CHAR(36)        NOT NULL,
   `warehouse_id` CHAR(36)        NOT NULL,
   `ref_no`       VARCHAR(100)    DEFAULT NULL,
@@ -1474,7 +1474,7 @@ CREATE TABLE `stock_adjustments` (
   `created_at`   TIMESTAMP       NULL DEFAULT NULL,
   `updated_at`   TIMESTAMP       NULL DEFAULT NULL,
   `deleted_at`   TIMESTAMP       NULL DEFAULT NULL,
-  PRIMARY KEY (`id`),
+  PRIMARY KEY (`stock_adjustment_id`),
   KEY `sa_tenant_id_idx`   (`tenant_id`),
   KEY `sa_warehouse_id_fk` (`warehouse_id`),
   KEY `sa_approved_by_fk`  (`approved_by`),
@@ -1490,14 +1490,14 @@ CREATE TABLE `stock_adjustments` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 CREATE TABLE `stock_adjustment_lines` (
-  `id`                  CHAR(36)        NOT NULL,
+  `stock_adjustment_line_id` CHAR(36)        NOT NULL,
   `stock_adjustment_id` CHAR(36)        NOT NULL,
   `product_id`          CHAR(36)        NOT NULL,
   `unit_id`             CHAR(36)        NOT NULL,
   `qty_system`          DECIMAL(15,4)   NOT NULL COMMENT 'What the system recorded',
   `qty_actual`          DECIMAL(15,4)   NOT NULL COMMENT 'What was physically counted',
   `deleted_at`          TIMESTAMP       NULL DEFAULT NULL,
-  PRIMARY KEY (`id`),
+  PRIMARY KEY (`stock_adjustment_line_id`),
   KEY `sal_stock_adjustment_id_fk` (`stock_adjustment_id`),
   KEY `sal_product_id_fk`          (`product_id`),
   CONSTRAINT `sal_adjustment_id_foreign`
@@ -1517,7 +1517,7 @@ CREATE TABLE `stock_adjustment_lines` (
 --  8A. SALES TRANSACTIONS
 -- ─────────────────────────────────────────────────────────
 CREATE TABLE `sales_transactions` (
-  `id`                   CHAR(36)        NOT NULL,
+  `sales_transaction_id` CHAR(36)        NOT NULL,
   `tenant_id`            CHAR(36)        NOT NULL,
   `branch_id`            CHAR(36)        DEFAULT NULL,
   `warehouse_id`         CHAR(36)        DEFAULT NULL,
@@ -1545,7 +1545,7 @@ CREATE TABLE `sales_transactions` (
   `created_at`           TIMESTAMP       NULL DEFAULT NULL,
   `updated_at`           TIMESTAMP       NULL DEFAULT NULL,
   `deleted_at`           TIMESTAMP       NULL DEFAULT NULL,
-  PRIMARY KEY (`id`),
+  PRIMARY KEY (`sales_transaction_id`),
   KEY `stx_tenant_type_idx`    (`tenant_id`, `type`),
   KEY `stx_tenant_date_idx`    (`tenant_id`, `transaction_date`),
   KEY `stx_tenant_status_idx`  (`tenant_id`, `status`),
@@ -1576,7 +1576,7 @@ CREATE TABLE `sales_transactions` (
 --  POS SESSIONS  (defined after sales_transactions for FK ordering)
 -- ─────────────────────────────────────────────────────────
 CREATE TABLE `pos_sessions` (
-  `id`               CHAR(36)        NOT NULL,
+  `pos_session_id` CHAR(36)        NOT NULL,
   `tenant_id`        CHAR(36)        NOT NULL,
   `branch_id`        CHAR(36)        NOT NULL,
   `warehouse_id`     CHAR(36)        DEFAULT NULL,
@@ -1595,7 +1595,7 @@ CREATE TABLE `pos_sessions` (
   `created_at`       TIMESTAMP       NULL DEFAULT NULL,
   `updated_at`       TIMESTAMP       NULL DEFAULT NULL,
   `deleted_at`       TIMESTAMP       NULL DEFAULT NULL,
-  PRIMARY KEY (`id`),
+  PRIMARY KEY (`pos_session_id`),
   KEY `pos_tenant_id_idx`      (`tenant_id`),
   KEY `pos_branch_id_fk`       (`branch_id`),
   KEY `pos_warehouse_id_fk`    (`warehouse_id`),
@@ -1628,7 +1628,7 @@ ALTER TABLE `serial_numbers`
     FOREIGN KEY (`sold_in_transaction_id`) REFERENCES `sales_transactions` (`id`) ON DELETE SET NULL;
 
 CREATE TABLE `sales_transaction_lines` (
-  `id`                           CHAR(36)        NOT NULL,
+  `sales_transaction_line_id` CHAR(36)        NOT NULL,
   `tenant_id`                    CHAR(36)        NOT NULL,
   `sales_transaction_id`         CHAR(36)        NOT NULL,
   `product_id`                   CHAR(36)        NOT NULL,
@@ -1646,7 +1646,7 @@ CREATE TABLE `sales_transaction_lines` (
   `created_at`                   TIMESTAMP       NULL DEFAULT NULL,
   `updated_at`                   TIMESTAMP       NULL DEFAULT NULL,
   `deleted_at`                   TIMESTAMP       NULL DEFAULT NULL,
-  PRIMARY KEY (`id`),
+  PRIMARY KEY (`sales_transaction_line_id`),
   KEY `stxl_tenant_id_idx`              (`tenant_id`),
   KEY `stxl_sales_transaction_id_fk`   (`sales_transaction_id`),
   KEY `stxl_product_id_fk`             (`product_id`),
@@ -1673,7 +1673,7 @@ CREATE TABLE `sales_transaction_lines` (
 --  8B. PURCHASE TRANSACTIONS
 -- ─────────────────────────────────────────────────────────
 CREATE TABLE `purchase_transactions` (
-  `id`               CHAR(36)        NOT NULL,
+  `purchase_transaction_id` CHAR(36)        NOT NULL,
   `tenant_id`        CHAR(36)        NOT NULL,
   `branch_id`        CHAR(36)        DEFAULT NULL,
   `warehouse_id`     CHAR(36)        DEFAULT NULL,
@@ -1699,7 +1699,7 @@ CREATE TABLE `purchase_transactions` (
   `created_at`       TIMESTAMP       NULL DEFAULT NULL,
   `updated_at`       TIMESTAMP       NULL DEFAULT NULL,
   `deleted_at`       TIMESTAMP       NULL DEFAULT NULL,
-  PRIMARY KEY (`id`),
+  PRIMARY KEY (`purchase_transaction_id`),
   KEY `ptx_tenant_type_idx`      (`tenant_id`, `type`),
   KEY `ptx_tenant_date_idx`      (`tenant_id`, `transaction_date`),
   KEY `ptx_tenant_status_idx`    (`tenant_id`, `status`),
@@ -1728,7 +1728,7 @@ CREATE TABLE `purchase_transactions` (
   COMMENT='Purchase invoices from suppliers and purchase returns.';
 
 CREATE TABLE `purchase_transaction_lines` (
-  `id`                      CHAR(36)        NOT NULL,
+  `purchase_transaction_line_id` CHAR(36)        NOT NULL,
   `tenant_id`               CHAR(36)        NOT NULL,
   `purchase_transaction_id` CHAR(36)        NOT NULL,
   `product_id`              CHAR(36)        NOT NULL,
@@ -1744,7 +1744,7 @@ CREATE TABLE `purchase_transaction_lines` (
   `created_at`              TIMESTAMP       NULL DEFAULT NULL,
   `updated_at`              TIMESTAMP       NULL DEFAULT NULL,
   `deleted_at`              TIMESTAMP       NULL DEFAULT NULL,
-  PRIMARY KEY (`id`),
+  PRIMARY KEY (`purchase_transaction_line_id`),
   KEY `ptxl_tenant_id_idx`               (`tenant_id`),
   KEY `ptxl_purchase_transaction_id_fk`  (`purchase_transaction_id`),
   KEY `ptxl_product_id_fk`               (`product_id`),
@@ -1773,7 +1773,7 @@ ALTER TABLE `sales_transaction_lines`
 --  8C. INVENTORY TRANSACTIONS
 -- ─────────────────────────────────────────────────────────
 CREATE TABLE `inventory_transactions` (
-  `id`               CHAR(36)        NOT NULL,
+  `inventory_transaction_id` CHAR(36)        NOT NULL,
   `tenant_id`        CHAR(36)        NOT NULL,
   `branch_id`        CHAR(36)        DEFAULT NULL,
   `warehouse_id`     CHAR(36)        DEFAULT NULL COMMENT 'Source warehouse',
@@ -1789,7 +1789,7 @@ CREATE TABLE `inventory_transactions` (
   `created_at`       TIMESTAMP       NULL DEFAULT NULL,
   `updated_at`       TIMESTAMP       NULL DEFAULT NULL,
   `deleted_at`       TIMESTAMP       NULL DEFAULT NULL,
-  PRIMARY KEY (`id`),
+  PRIMARY KEY (`inventory_transaction_id`),
   KEY `itx_tenant_type_idx`    (`tenant_id`, `type`),
   KEY `itx_tenant_date_idx`    (`tenant_id`, `transaction_date`),
   KEY `itx_branch_id_fk`       (`branch_id`),
@@ -1813,7 +1813,7 @@ CREATE TABLE `inventory_transactions` (
   COMMENT='Inventory movements: transfers, opening stock, spoilage, manual adjustments.';
 
 CREATE TABLE `inventory_transaction_lines` (
-  `id`                       CHAR(36)        NOT NULL,
+  `inventory_transaction_line_id` CHAR(36)        NOT NULL,
   `tenant_id`                CHAR(36)        NOT NULL,
   `inventory_transaction_id` CHAR(36)        NOT NULL,
   `product_id`               CHAR(36)        NOT NULL,
@@ -1829,7 +1829,7 @@ CREATE TABLE `inventory_transaction_lines` (
   `created_at`               TIMESTAMP       NULL DEFAULT NULL,
   `updated_at`               TIMESTAMP       NULL DEFAULT NULL,
   `deleted_at`               TIMESTAMP       NULL DEFAULT NULL,
-  PRIMARY KEY (`id`),
+  PRIMARY KEY (`inventory_transaction_line_id`),
   KEY `itxl_tenant_id_idx`                  (`tenant_id`),
   KEY `itxl_inventory_transaction_id_fk`    (`inventory_transaction_id`),
   KEY `itxl_product_id_fk`                  (`product_id`),
@@ -1851,7 +1851,7 @@ CREATE TABLE `inventory_transaction_lines` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 CREATE TABLE `transaction_update_histories` (
-  `id`               CHAR(36)        NOT NULL,
+  `transaction_update_history_id` CHAR(36)        NOT NULL,
   `tenant_id`        CHAR(36)        NOT NULL,
   `transaction_type` TINYINT         NOT NULL COMMENT '1=sales | 2=purchase | 3=inventory',
   `transaction_id`   CHAR(36)        NOT NULL,
@@ -1862,7 +1862,7 @@ CREATE TABLE `transaction_update_histories` (
   `changes_summary`  JSON            DEFAULT NULL,
   `updated_by`       CHAR(36)        NOT NULL,
   `created_at`       TIMESTAMP       NULL DEFAULT NULL,
-  PRIMARY KEY (`id`),
+  PRIMARY KEY (`transaction_update_history_id`),
   KEY `tuh_tenant_transaction_idx` (`tenant_id`, `transaction_id`),
   KEY `tuh_updated_by_fk`          (`updated_by`),
   CONSTRAINT `tuh_tenant_id_foreign`
@@ -1878,7 +1878,7 @@ CREATE TABLE `transaction_update_histories` (
 -- ============================================================
 
 CREATE TABLE `tenant_payments` (
-  `id`         CHAR(36)        NOT NULL,
+  `tenant_payment_id` CHAR(36)        NOT NULL,
   `tenant_id`  CHAR(36)        NOT NULL,
   `contact_id` CHAR(36)        DEFAULT NULL,
   `account_id` CHAR(36)        DEFAULT NULL,
@@ -1891,7 +1891,7 @@ CREATE TABLE `tenant_payments` (
   `created_at` TIMESTAMP       NULL DEFAULT NULL,
   `updated_at` TIMESTAMP       NULL DEFAULT NULL,
   `deleted_at` TIMESTAMP       NULL DEFAULT NULL,
-  PRIMARY KEY (`id`),
+  PRIMARY KEY (`tenant_payment_id`),
   KEY `tp_tenant_id_idx`   (`tenant_id`),
   KEY `tp_contact_id_fk`   (`contact_id`),
   KEY `tp_account_id_fk`   (`account_id`),
@@ -1908,7 +1908,7 @@ CREATE TABLE `tenant_payments` (
   COMMENT='Standalone open payments (prepayments not tied to a single invoice).';
 
 CREATE TABLE `tenant_payment_transactions` (
-  `id`               CHAR(36)        NOT NULL,
+  `tenant_payment_transaction_id` CHAR(36)        NOT NULL,
   `tenant_id`        CHAR(36)        NOT NULL,
   `transaction_type` TINYINT         NOT NULL COMMENT '1=sales | 2=purchase',
   `transaction_id`   CHAR(36)        NOT NULL COMMENT 'Polymorphic → sales_transactions or purchase_transactions',
@@ -1922,7 +1922,7 @@ CREATE TABLE `tenant_payment_transactions` (
   `created_at`       TIMESTAMP       NULL DEFAULT NULL,
   `updated_at`       TIMESTAMP       NULL DEFAULT NULL,
   `deleted_at`       TIMESTAMP       NULL DEFAULT NULL,
-  PRIMARY KEY (`id`),
+  PRIMARY KEY (`tenant_payment_transaction_id`),
   KEY `tpt_tenant_id_idx`      (`tenant_id`),
   KEY `tpt_transaction_idx`    (`transaction_type`, `transaction_id`),
   KEY `tpt_payment_id_fk`      (`payment_id`),
@@ -1948,7 +1948,7 @@ CREATE TABLE `tenant_payment_transactions` (
 -- ============================================================
 
 CREATE TABLE `quotations` (
-  `id`                          CHAR(36)        NOT NULL,
+  `quotation_id` CHAR(36)        NOT NULL,
   `tenant_id`                   CHAR(36)        NOT NULL,
   `branch_id`                   CHAR(36)        NOT NULL,
   `contact_id`                  CHAR(36)        DEFAULT NULL,
@@ -1967,7 +1967,7 @@ CREATE TABLE `quotations` (
   `created_at`                  TIMESTAMP       NULL DEFAULT NULL,
   `updated_at`                  TIMESTAMP       NULL DEFAULT NULL,
   `deleted_at`                  TIMESTAMP       NULL DEFAULT NULL,
-  PRIMARY KEY (`id`),
+  PRIMARY KEY (`quotation_id`),
   KEY `q_tenant_id_idx`                   (`tenant_id`),
   KEY `q_branch_id_fk`                    (`branch_id`),
   KEY `q_contact_id_fk`                   (`contact_id`),
@@ -1985,7 +1985,7 @@ CREATE TABLE `quotations` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 CREATE TABLE `quotation_lines` (
-  `id`           CHAR(36)        NOT NULL,
+  `quotation_line_id` CHAR(36)        NOT NULL,
   `quotation_id` CHAR(36)        NOT NULL,
   `product_id`   CHAR(36)        NOT NULL,
   `unit_id`      CHAR(36)        NOT NULL,
@@ -1995,7 +1995,7 @@ CREATE TABLE `quotation_lines` (
   `tax_rate`     DECIMAL(5,2)    NOT NULL DEFAULT 0.00,
   `total`        DECIMAL(15,4)   NOT NULL,
   `deleted_at`   TIMESTAMP       NULL DEFAULT NULL,
-  PRIMARY KEY (`id`),
+  PRIMARY KEY (`quotation_line_id`),
   KEY `ql_quotation_id_fk` (`quotation_id`),
   KEY `ql_product_id_fk`   (`product_id`),
   CONSTRAINT `ql_quotation_id_foreign`
@@ -2007,7 +2007,7 @@ CREATE TABLE `quotation_lines` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 CREATE TABLE `orders` (
-  `id`               CHAR(36)        NOT NULL,
+  `order_id` CHAR(36)        NOT NULL,
   `tenant_id`        CHAR(36)        NOT NULL,
   `branch_id`        CHAR(36)        NOT NULL,
   `warehouse_id`     CHAR(36)        DEFAULT NULL,
@@ -2026,7 +2026,7 @@ CREATE TABLE `orders` (
   `created_at`       TIMESTAMP       NULL DEFAULT NULL,
   `updated_at`       TIMESTAMP       NULL DEFAULT NULL,
   `deleted_at`       TIMESTAMP       NULL DEFAULT NULL,
-  PRIMARY KEY (`id`),
+  PRIMARY KEY (`order_id`),
   KEY `orders_tenant_id_idx`   (`tenant_id`),
   KEY `orders_branch_id_fk`    (`branch_id`),
   KEY `orders_warehouse_id_fk` (`warehouse_id`),
@@ -2048,7 +2048,7 @@ CREATE TABLE `orders` (
   COMMENT='B2B/portal orders. Pre-invoice stage.';
 
 CREATE TABLE `order_items` (
-  `id`         CHAR(36)        NOT NULL,
+  `order_item_id` CHAR(36)        NOT NULL,
   `order_id`   CHAR(36)        NOT NULL,
   `product_id` CHAR(36)        NOT NULL,
   `unit_id`    CHAR(36)        NOT NULL,
@@ -2059,7 +2059,7 @@ CREATE TABLE `order_items` (
   `created_at` TIMESTAMP       NULL DEFAULT NULL,
   `updated_at` TIMESTAMP       NULL DEFAULT NULL,
   `deleted_at` TIMESTAMP       NULL DEFAULT NULL,
-  PRIMARY KEY (`id`),
+  PRIMARY KEY (`order_item_id`),
   KEY `oi_order_id_fk`   (`order_id`),
   KEY `oi_product_id_fk` (`product_id`),
   CONSTRAINT `oi_order_id_foreign`
@@ -2076,7 +2076,7 @@ CREATE TABLE `order_items` (
 -- ============================================================
 
 CREATE TABLE `purchase_orders` (
-  `id`            CHAR(36)        NOT NULL,
+  `purchase_order_id` CHAR(36)        NOT NULL,
   `tenant_id`     CHAR(36)        NOT NULL,
   `branch_id`     CHAR(36)        NOT NULL,
   `warehouse_id`  CHAR(36)        DEFAULT NULL,
@@ -2094,7 +2094,7 @@ CREATE TABLE `purchase_orders` (
   `created_at`    TIMESTAMP       NULL DEFAULT NULL,
   `updated_at`    TIMESTAMP       NULL DEFAULT NULL,
   `deleted_at`    TIMESTAMP       NULL DEFAULT NULL,
-  PRIMARY KEY (`id`),
+  PRIMARY KEY (`purchase_order_id`),
   KEY `po_tenant_id_idx`   (`tenant_id`),
   KEY `po_branch_id_fk`    (`branch_id`),
   KEY `po_warehouse_id_fk` (`warehouse_id`),
@@ -2113,7 +2113,7 @@ CREATE TABLE `purchase_orders` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 CREATE TABLE `purchase_order_lines` (
-  `id`                CHAR(36)        NOT NULL,
+  `purchase_order_line_id` CHAR(36)        NOT NULL,
   `purchase_order_id` CHAR(36)        NOT NULL,
   `product_id`        CHAR(36)        NOT NULL,
   `unit_id`           CHAR(36)        NOT NULL,
@@ -2124,7 +2124,7 @@ CREATE TABLE `purchase_order_lines` (
   `tax_rate`          DECIMAL(5,2)    NOT NULL DEFAULT 0.00,
   `total`             DECIMAL(15,4)   NOT NULL,
   `deleted_at`        TIMESTAMP       NULL DEFAULT NULL,
-  PRIMARY KEY (`id`),
+  PRIMARY KEY (`purchase_order_line_id`),
   KEY `pol_purchase_order_id_fk` (`purchase_order_id`),
   KEY `pol_product_id_fk`        (`product_id`),
   CONSTRAINT `pol_purchase_order_id_foreign`
@@ -2146,7 +2146,7 @@ ALTER TABLE `purchase_transactions`
 -- ============================================================
 
 CREATE TABLE `crm_leads` (
-  `id`                  CHAR(36)        NOT NULL,
+  `crm_lead_id` CHAR(36)        NOT NULL,
   `tenant_id`           CHAR(36)        NOT NULL,
   `contact_id`          CHAR(36)        DEFAULT NULL COMMENT 'Set when lead converts to contact',
   `name_en`             VARCHAR(255)    NOT NULL,
@@ -2164,7 +2164,7 @@ CREATE TABLE `crm_leads` (
   `created_at`          TIMESTAMP       NULL DEFAULT NULL,
   `updated_at`          TIMESTAMP       NULL DEFAULT NULL,
   `deleted_at`          TIMESTAMP       NULL DEFAULT NULL,
-  PRIMARY KEY (`id`),
+  PRIMARY KEY (`crm_lead_id`),
   KEY `leads_tenant_status_idx`   (`tenant_id`, `status`),
   KEY `leads_tenant_assigned_idx` (`tenant_id`, `assigned_to`),
   KEY `leads_contact_id_fk`       (`contact_id`),
@@ -2179,7 +2179,7 @@ CREATE TABLE `crm_leads` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 CREATE TABLE `crm_activities` (
-  `id`           CHAR(36)        NOT NULL,
+  `crm_activity_id` CHAR(36)        NOT NULL,
   `tenant_id`    CHAR(36)        NOT NULL,
   `lead_id`      CHAR(36)        DEFAULT NULL,
   `contact_id`   CHAR(36)        DEFAULT NULL,
@@ -2194,7 +2194,7 @@ CREATE TABLE `crm_activities` (
   `created_at`   TIMESTAMP       NULL DEFAULT NULL,
   `updated_at`   TIMESTAMP       NULL DEFAULT NULL,
   `deleted_at`   TIMESTAMP       NULL DEFAULT NULL,
-  PRIMARY KEY (`id`),
+  PRIMARY KEY (`crm_activity_id`),
   KEY `crma_tenant_id_idx`  (`tenant_id`),
   KEY `crma_lead_id_fk`     (`lead_id`),
   KEY `crma_contact_id_fk`  (`contact_id`),
@@ -2217,7 +2217,7 @@ CREATE TABLE `crm_activities` (
 -- ============================================================
 
 CREATE TABLE `departments` (
-  `id`         CHAR(36)        NOT NULL,
+  `department_id` CHAR(36)        NOT NULL,
   `tenant_id`  CHAR(36)        NOT NULL,
   `branch_id`  CHAR(36)        DEFAULT NULL,
   `parent_id`  CHAR(36)        DEFAULT NULL,
@@ -2229,7 +2229,7 @@ CREATE TABLE `departments` (
   `created_at` TIMESTAMP       NULL DEFAULT NULL,
   `updated_at` TIMESTAMP       NULL DEFAULT NULL,
   `deleted_at` TIMESTAMP       NULL DEFAULT NULL,
-  PRIMARY KEY (`id`),
+  PRIMARY KEY (`department_id`),
   KEY `dept_tenant_id_idx` (`tenant_id`),
   KEY `dept_branch_id_fk`  (`branch_id`),
   KEY `dept_parent_id_fk`  (`parent_id`),
@@ -2242,7 +2242,7 @@ CREATE TABLE `departments` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 CREATE TABLE `job_positions` (
-  `id`             CHAR(36)        NOT NULL,
+  `job_position_id` CHAR(36)        NOT NULL,
   `tenant_id`      CHAR(36)        NOT NULL,
   `department_id`  CHAR(36)        DEFAULT NULL,
   `title_en`       VARCHAR(255)    NOT NULL,
@@ -2255,7 +2255,7 @@ CREATE TABLE `job_positions` (
   `created_at`     TIMESTAMP       NULL DEFAULT NULL,
   `updated_at`     TIMESTAMP       NULL DEFAULT NULL,
   `deleted_at`     TIMESTAMP       NULL DEFAULT NULL,
-  PRIMARY KEY (`id`),
+  PRIMARY KEY (`job_position_id`),
   KEY `jp_tenant_id_idx`    (`tenant_id`),
   KEY `jp_department_id_fk` (`department_id`),
   CONSTRAINT `jp_tenant_id_foreign`
@@ -2265,7 +2265,7 @@ CREATE TABLE `job_positions` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 CREATE TABLE `employees` (
-  `id`               CHAR(36)        NOT NULL,
+  `employee_id` CHAR(36)        NOT NULL,
   `tenant_id`        CHAR(36)        NOT NULL,
   `user_id`          CHAR(36)        DEFAULT NULL COMMENT 'If employee has system login',
   `branch_id`        CHAR(36)        DEFAULT NULL,
@@ -2293,7 +2293,7 @@ CREATE TABLE `employees` (
   `created_at`       TIMESTAMP       NULL DEFAULT NULL,
   `updated_at`       TIMESTAMP       NULL DEFAULT NULL,
   `deleted_at`       TIMESTAMP       NULL DEFAULT NULL,
-  PRIMARY KEY (`id`),
+  PRIMARY KEY (`employee_id`),
   KEY `emp_tenant_id_idx`       (`tenant_id`),
   KEY `emp_tenant_code_idx`     (`tenant_id`, `employee_code`),
   KEY `emp_user_id_fk`          (`user_id`),
@@ -2323,7 +2323,7 @@ ALTER TABLE `departments`
     FOREIGN KEY (`manager_id`) REFERENCES `employees` (`id`) ON DELETE SET NULL;
 
 CREATE TABLE `attendance_logs` (
-  `id`             CHAR(36)        NOT NULL,
+  `attendance_log_id` CHAR(36)        NOT NULL,
   `tenant_id`      CHAR(36)        NOT NULL,
   `employee_id`    CHAR(36)        NOT NULL,
   `date`           DATE            NOT NULL,
@@ -2335,7 +2335,7 @@ CREATE TABLE `attendance_logs` (
   `created_at`     TIMESTAMP       NULL DEFAULT NULL,
   `updated_at`     TIMESTAMP       NULL DEFAULT NULL,
   `deleted_at`     TIMESTAMP       NULL DEFAULT NULL,
-  PRIMARY KEY (`id`),
+  PRIMARY KEY (`attendance_log_id`),
   UNIQUE KEY `attendance_employee_date_unique` (`tenant_id`, `employee_id`, `date`),
   KEY `att_tenant_date_idx`  (`tenant_id`, `date`),
   KEY `att_employee_id_fk`   (`employee_id`),
@@ -2346,7 +2346,7 @@ CREATE TABLE `attendance_logs` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 CREATE TABLE `leave_types` (
-  `id`           CHAR(36)        NOT NULL,
+  `leave_type_id` CHAR(36)        NOT NULL,
   `tenant_id`    CHAR(36)        NOT NULL,
   `name_en`      VARCHAR(100)    NOT NULL COMMENT 'Annual | Sick | Emergency',
   `name_ar`      VARCHAR(100)    NOT NULL,
@@ -2355,14 +2355,14 @@ CREATE TABLE `leave_types` (
   `created_at`   TIMESTAMP       NULL DEFAULT NULL,
   `updated_at`   TIMESTAMP       NULL DEFAULT NULL,
   `deleted_at`   TIMESTAMP       NULL DEFAULT NULL,
-  PRIMARY KEY (`id`),
+  PRIMARY KEY (`leave_type_id`),
   KEY `lt_tenant_id_idx` (`tenant_id`),
   CONSTRAINT `lt_tenant_id_foreign`
     FOREIGN KEY (`tenant_id`) REFERENCES `tenants` (`id`) ON DELETE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 CREATE TABLE `leave_requests` (
-  `id`             CHAR(36)        NOT NULL,
+  `leave_request_id` CHAR(36)        NOT NULL,
   `tenant_id`      CHAR(36)        NOT NULL,
   `employee_id`    CHAR(36)        NOT NULL,
   `leave_type_id`  CHAR(36)        NOT NULL,
@@ -2377,7 +2377,7 @@ CREATE TABLE `leave_requests` (
   `created_at`     TIMESTAMP       NULL DEFAULT NULL,
   `updated_at`     TIMESTAMP       NULL DEFAULT NULL,
   `deleted_at`     TIMESTAMP       NULL DEFAULT NULL,
-  PRIMARY KEY (`id`),
+  PRIMARY KEY (`leave_request_id`),
   KEY `lr_tenant_employee_idx` (`tenant_id`, `employee_id`),
   KEY `lr_employee_id_fk`      (`employee_id`),
   KEY `lr_leave_type_id_fk`    (`leave_type_id`),
@@ -2393,7 +2393,7 @@ CREATE TABLE `leave_requests` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 CREATE TABLE `salary_components` (
-  `id`          CHAR(36)        NOT NULL,
+  `salary_component_id` CHAR(36)        NOT NULL,
   `tenant_id`   CHAR(36)        NOT NULL,
   `name_en`     VARCHAR(255)    NOT NULL COMMENT 'Housing Allowance | Social Insurance',
   `name_ar`     VARCHAR(255)    NOT NULL,
@@ -2405,21 +2405,21 @@ CREATE TABLE `salary_components` (
   `created_at`  TIMESTAMP       NULL DEFAULT NULL,
   `updated_at`  TIMESTAMP       NULL DEFAULT NULL,
   `deleted_at`  TIMESTAMP       NULL DEFAULT NULL,
-  PRIMARY KEY (`id`),
+  PRIMARY KEY (`salary_component_id`),
   KEY `sc_tenant_id_idx` (`tenant_id`),
   CONSTRAINT `sc_tenant_id_foreign`
     FOREIGN KEY (`tenant_id`) REFERENCES `tenants` (`id`) ON DELETE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 CREATE TABLE `employee_salary_components` (
-  `id`                  CHAR(36)        NOT NULL,
+  `employee_salary_component_id` CHAR(36)        NOT NULL,
   `employee_id`         CHAR(36)        NOT NULL,
   `salary_component_id` CHAR(36)        NOT NULL,
   `value`               DECIMAL(15,4)   NOT NULL,
   `effective_from`      DATE            DEFAULT NULL,
   `effective_to`        DATE            DEFAULT NULL,
   `deleted_at`          TIMESTAMP       NULL DEFAULT NULL,
-  PRIMARY KEY (`id`),
+  PRIMARY KEY (`employee_salary_component_id`),
   KEY `esc_employee_id_fk`         (`employee_id`),
   KEY `esc_salary_component_id_fk` (`salary_component_id`),
   CONSTRAINT `esc_employee_id_foreign`
@@ -2429,7 +2429,7 @@ CREATE TABLE `employee_salary_components` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 CREATE TABLE `payroll_periods` (
-  `id`               CHAR(36)        NOT NULL,
+  `payroll_period_id` CHAR(36)        NOT NULL,
   `tenant_id`        CHAR(36)        NOT NULL,
   `name`             VARCHAR(100)    DEFAULT NULL,
   `period_start`     DATE            NOT NULL,
@@ -2443,7 +2443,7 @@ CREATE TABLE `payroll_periods` (
   `created_at`       TIMESTAMP       NULL DEFAULT NULL,
   `updated_at`       TIMESTAMP       NULL DEFAULT NULL,
   `deleted_at`       TIMESTAMP       NULL DEFAULT NULL,
-  PRIMARY KEY (`id`),
+  PRIMARY KEY (`payroll_period_id`),
   KEY `pp_tenant_id_idx`   (`tenant_id`),
   KEY `pp_processed_by_fk` (`processed_by`),
   CONSTRAINT `pp_tenant_id_foreign`
@@ -2453,7 +2453,7 @@ CREATE TABLE `payroll_periods` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 CREATE TABLE `payroll_slips` (
-  `id`                CHAR(36)        NOT NULL,
+  `payroll_slip_id` CHAR(36)        NOT NULL,
   `tenant_id`         CHAR(36)        NOT NULL,
   `payroll_period_id` CHAR(36)        NOT NULL,
   `employee_id`       CHAR(36)        NOT NULL,
@@ -2473,7 +2473,7 @@ CREATE TABLE `payroll_slips` (
   `created_at`        TIMESTAMP       NULL DEFAULT NULL,
   `updated_at`        TIMESTAMP       NULL DEFAULT NULL,
   `deleted_at`        TIMESTAMP       NULL DEFAULT NULL,
-  PRIMARY KEY (`id`),
+  PRIMARY KEY (`payroll_slip_id`),
   UNIQUE KEY `payroll_slips_period_employee_unique` (`tenant_id`, `payroll_period_id`, `employee_id`),
   KEY `ps_tenant_id_idx`        (`tenant_id`),
   KEY `ps_payroll_period_id_fk` (`payroll_period_id`),
@@ -2492,7 +2492,7 @@ CREATE TABLE `payroll_slips` (
 -- ============================================================
 
 CREATE TABLE `report_templates` (
-  `id`         CHAR(36)        NOT NULL,
+  `report_template_id` CHAR(36)        NOT NULL,
   `tenant_id`  CHAR(36)        NOT NULL,
   `name_en`    VARCHAR(255)    NOT NULL,
   `name_ar`    VARCHAR(255)    NOT NULL,
@@ -2504,7 +2504,7 @@ CREATE TABLE `report_templates` (
   `created_at` TIMESTAMP       NULL DEFAULT NULL,
   `updated_at` TIMESTAMP       NULL DEFAULT NULL,
   `deleted_at` TIMESTAMP       NULL DEFAULT NULL,
-  PRIMARY KEY (`id`),
+  PRIMARY KEY (`report_template_id`),
   KEY `rt_tenant_id_idx`  (`tenant_id`),
   KEY `rt_created_by_fk`  (`created_by`),
   CONSTRAINT `rt_tenant_id_foreign`
@@ -2514,7 +2514,7 @@ CREATE TABLE `report_templates` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 CREATE TABLE `scheduled_reports` (
-  `id`                 CHAR(36)        NOT NULL,
+  `scheduled_report_id` CHAR(36)        NOT NULL,
   `tenant_id`          CHAR(36)        NOT NULL,
   `report_template_id` CHAR(36)        DEFAULT NULL,
   `name_en`            VARCHAR(255)    NOT NULL,
@@ -2529,7 +2529,7 @@ CREATE TABLE `scheduled_reports` (
   `created_at`         TIMESTAMP       NULL DEFAULT NULL,
   `updated_at`         TIMESTAMP       NULL DEFAULT NULL,
   `deleted_at`         TIMESTAMP       NULL DEFAULT NULL,
-  PRIMARY KEY (`id`),
+  PRIMARY KEY (`scheduled_report_id`),
   KEY `sr_tenant_id_idx`         (`tenant_id`),
   KEY `sr_report_template_id_fk` (`report_template_id`),
   CONSTRAINT `sr_tenant_id_foreign`
@@ -2541,14 +2541,14 @@ CREATE TABLE `scheduled_reports` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 CREATE TABLE `kpi_snapshots` (
-  `id`         CHAR(36)        NOT NULL,
+  `kpi_snapshot_id` CHAR(36)        NOT NULL,
   `tenant_id`  CHAR(36)        NOT NULL,
   `date`       DATE            NOT NULL,
   `metric`     VARCHAR(100)    NOT NULL COMMENT 'total_sales | gross_profit | new_customers | inventory_value',
   `value`      DECIMAL(20,4)   NOT NULL,
   `branch_id`  CHAR(36)        DEFAULT NULL,
   `created_at` TIMESTAMP       NULL DEFAULT NULL,
-  PRIMARY KEY (`id`),
+  PRIMARY KEY (`kpi_snapshot_id`),
   UNIQUE KEY `kpi_tenant_date_metric_branch_unique` (`tenant_id`, `date`, `metric`, `branch_id`),
   KEY `kpi_tenant_metric_idx` (`tenant_id`, `metric`, `date`),
   KEY `kpi_branch_id_fk`      (`branch_id`),
@@ -2565,7 +2565,7 @@ CREATE TABLE `kpi_snapshots` (
 -- ============================================================
 
 CREATE TABLE `activity_log` (
-  `id`           CHAR(36)        NOT NULL,
+  `activity_lo_id` CHAR(36)        NOT NULL,
   `tenant_id`    CHAR(36)        NOT NULL,
   `user_id`      CHAR(36)        NOT NULL,
   `subject_id`   CHAR(36)        DEFAULT NULL,
@@ -2577,7 +2577,7 @@ CREATE TABLE `activity_log` (
   `properties`   JSON            DEFAULT NULL COMMENT 'Before/after diff',
   `ip_address`   VARCHAR(45)     DEFAULT NULL,
   `created_at`   TIMESTAMP       NULL DEFAULT NULL,
-  PRIMARY KEY (`id`),
+  PRIMARY KEY (`activity_lo_id`),
   KEY `al_tenant_id_idx`     (`tenant_id`),
   KEY `al_tenant_module_idx` (`tenant_id`, `module`),
   KEY `al_tenant_subject_idx` (`tenant_id`, `subject_type`, `subject_id`),
@@ -2590,7 +2590,7 @@ CREATE TABLE `activity_log` (
   COMMENT='Custom ActivityLog module — audit trail for all model mutations per tenant.';
 
 CREATE TABLE `notifications` (
-  `id`              CHAR(36)        NOT NULL,
+  `notification_id` CHAR(36)        NOT NULL,
   `type`            VARCHAR(255)    NOT NULL,
   `notifiable_type` VARCHAR(255)    NOT NULL,
   `notifiable_id`   CHAR(36)        NOT NULL,
@@ -2599,20 +2599,20 @@ CREATE TABLE `notifications` (
   `created_at`      TIMESTAMP       NULL DEFAULT NULL,
   `updated_at`      TIMESTAMP       NULL DEFAULT NULL,
   `deleted_at`      TIMESTAMP       NULL DEFAULT NULL,
-  PRIMARY KEY (`id`),
+  PRIMARY KEY (`notification_id`),
   KEY `notifications_notifiable_idx` (`notifiable_type`, `notifiable_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci
   COMMENT='Laravel in-app notifications (polymorphic). Tenant-neutral — scoped by notifiable_id.';
 
 CREATE TABLE `failed_jobs` (
-  `id`         CHAR(36)        NOT NULL,
+  `failed_job_id` CHAR(36)        NOT NULL,
   `uuid`       VARCHAR(255)    NOT NULL,
   `connection` TEXT            NOT NULL,
   `queue`      TEXT            NOT NULL,
   `payload`    LONGTEXT        NOT NULL,
   `exception`  LONGTEXT        NOT NULL,
   `failed_at`  TIMESTAMP       NOT NULL DEFAULT CURRENT_TIMESTAMP,
-  PRIMARY KEY (`id`),
+  PRIMARY KEY (`failed_job_id`),
   UNIQUE KEY `failed_jobs_uuid_unique` (`uuid`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
@@ -2620,7 +2620,7 @@ CREATE TABLE `migrations` (
   `id`        INT UNSIGNED    NOT NULL AUTO_INCREMENT,
   `migration` VARCHAR(255)    NOT NULL,
   `batch`     INT             NOT NULL,
-  PRIMARY KEY (`id`)
+  PRIMARY KEY (`migration_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci
   COMMENT='Laravel migration tracking table. Uses auto-increment by framework convention.';
 

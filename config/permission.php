@@ -72,6 +72,7 @@ return [
          * For example, this would be nice if your primary keys are all UUIDs. In
          * that case, name this `model_uuid`.
          */
+        'role_morph_key' => 'model_id',
         'model_morph_key' => 'model_id',
 
         /*

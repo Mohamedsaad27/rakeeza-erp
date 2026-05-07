@@ -25,7 +25,7 @@ return new class extends Migration {
         //  permissions
         // ------------------------------------------------------------------ //
         Schema::create($tableNames['permissions'], static function (Blueprint $table) use ($modelMorphKey) {
-            $table->uuid('id')->primary();  // CHAR(36) UUID
+            $table->uuid('permission_id')->primary();  // CHAR(36) UUID
             $table->uuid('tenant_id')->index();  // tenant scope
 
             $table->string('name');  // e.g. contact.create
@@ -41,7 +41,7 @@ return new class extends Migration {
         //  roles
         // ------------------------------------------------------------------ //
         Schema::create($tableNames['roles'], static function (Blueprint $table) {
-            $table->uuid('id')->primary();  // CHAR(36) UUID
+            $table->uuid('role_id')->primary();  // CHAR(36) UUID
             $table->uuid('tenant_id')->index();  // tenant scope
 
             $table->string('name');  // e.g. admin, cashier
@@ -66,7 +66,7 @@ return new class extends Migration {
 
             $table
                 ->foreign($pivotPermission)
-                ->references('id')
+                ->references('permission_id')
                 ->on($tableNames['permissions'])
                 ->cascadeOnDelete();
 
@@ -93,7 +93,7 @@ return new class extends Migration {
 
             $table
                 ->foreign($pivotRole)
-                ->references('id')
+                ->references('role_id')
                 ->on($tableNames['roles'])
                 ->cascadeOnDelete();
 
@@ -119,13 +119,13 @@ return new class extends Migration {
 
             $table
                 ->foreign($pivotPermission)
-                ->references('id')
+                ->references('permission_id')
                 ->on($tableNames['permissions'])
                 ->cascadeOnDelete();
 
             $table
                 ->foreign($pivotRole)
-                ->references('id')
+                ->references('role_id')
                 ->on($tableNames['roles'])
                 ->cascadeOnDelete();
 
