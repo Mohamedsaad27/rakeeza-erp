@@ -1,0 +1,13 @@
+{
+    "name": "Finance",
+    "alias": "Finance",
+    "description": "Finance module",
+    "keywords": [
+        "Finance"
+    ],
+    "priority": 0,
+    "providers": [
+        "App\\Modules\\Finance\\Infrastructure\\Providers\\FinanceServiceProvider"
+    ],
+    "files": []
+}

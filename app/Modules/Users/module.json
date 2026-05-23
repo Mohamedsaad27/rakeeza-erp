@@ -1,0 +1,13 @@
+{
+    "name": "Users",
+    "alias": "Users",
+    "description": "Users module",
+    "keywords": [
+        "Users"
+    ],
+    "priority": 0,
+    "providers": [
+        "App\\Modules\\Users\\Infrastructure\\Providers\\UsersServiceProvider"
+    ],
+    "files": []
+}

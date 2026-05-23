@@ -1,0 +1,13 @@
+{
+    "name": "Settings",
+    "alias": "Settings",
+    "description": "Settings module",
+    "keywords": [
+        "Settings"
+    ],
+    "priority": 0,
+    "providers": [
+        "App\\Modules\\Settings\\Infrastructure\\Providers\\SettingsServiceProvider"
+    ],
+    "files": []
+}

@@ -1,0 +1,13 @@
+{
+    "name": "PlatformUsers",
+    "alias": "PlatformUsers",
+    "description": "PlatformUsers module",
+    "keywords": [
+        "PlatformUsers"
+    ],
+    "priority": 0,
+    "providers": [
+        "App\\Modules\\PlatformUsers\\Infrastructure\\Providers\\PlatformUsersServiceProvider"
+    ],
+    "files": []
+}

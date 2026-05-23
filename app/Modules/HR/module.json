@@ -1,0 +1,13 @@
+{
+    "name": "HR",
+    "alias": "HR",
+    "description": "HR module",
+    "keywords": [
+        "HR"
+    ],
+    "priority": 0,
+    "providers": [
+        "App\\Modules\\HR\\Infrastructure\\Providers\\HRServiceProvider"
+    ],
+    "files": []
+}

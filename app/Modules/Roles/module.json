@@ -1,0 +1,13 @@
+{
+    "name": "Roles",
+    "alias": "Roles",
+    "description": "Roles module",
+    "keywords": [
+        "Roles"
+    ],
+    "priority": 0,
+    "providers": [
+        "App\\Modules\\Roles\\Infrastructure\\Providers\\RolesServiceProvider"
+    ],
+    "files": []
+}

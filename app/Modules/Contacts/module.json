@@ -1,0 +1,13 @@
+{
+    "name": "Contacts",
+    "alias": "Contacts",
+    "description": "Contacts module",
+    "keywords": [
+        "Contacts"
+    ],
+    "priority": 0,
+    "providers": [
+        "App\\Modules\\Contacts\\Infrastructure\\Providers\\ContactsServiceProvider"
+    ],
+    "files": []
+}

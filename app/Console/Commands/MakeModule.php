@@ -14,7 +14,7 @@ class MakeModule extends Command
     public function handle(): void
     {
         $name = Str::studly($this->argument('name'));
-        $basePath = base_path("App/Modules/{$name}");
+        $basePath = base_path("app/Modules/{$name}");
 
         if (File::exists($basePath)) {
             $this->error("Module already exists ❌");
@@ -43,13 +43,14 @@ class MakeModule extends Command
             "Domain/Interfaces",
             "Domain/Services",
 
-            "Infrastructure/Persistence/Models",
-            "Infrastructure/Persistence/Repositories",
-            "Infrastructure/Providers",
-            "Infrastructure/Config",
+            "Infrastructure/Database/Models",
             "Infrastructure/Database/Migrations",
             "Infrastructure/Database/Factories",
             "Infrastructure/Database/Seeders",
+            "Infrastructure/Persistence",
+            "Infrastructure/Providers",
+            "Infrastructure/Config",
+            "Infrastructure/Notifications",
             "Infrastructure/ExternalServices",
 
             "Presentation/Http/Controllers",
@@ -57,9 +58,7 @@ class MakeModule extends Command
             "Presentation/Http/Resources",
             "Presentation/Resources/Lang/en",
             "Presentation/Resources/Lang/ar",
-
             "Presentation/Routes",
-            "Presentation/Views",
         ];
 
         foreach ($folders as $folder) {
@@ -104,14 +103,17 @@ class MakeModule extends Command
         namespace App\Modules\\{$name}\Infrastructure\Providers;
 
         use Illuminate\Support\ServiceProvider;
-        use App\Modules\\{$name}\Domain\Interfaces\\{$name}RepositoryInterface;
-        use App\Modules\\{$name}\Infrastructure\Persistence\Repositories\\{$name}Repository;
 
         class RepositoryServiceProvider extends ServiceProvider
         {
             public function register(): void
             {
-                
+                // Bind repository interfaces to implementations here
+                // Example:
+                // \$this->app->bind(
+                //     \\App\\Modules\\{$name}\\Domain\\Interfaces\\{$name}RepositoryInterface::class,
+                //     \\App\\Modules\\{$name}\\Infrastructure\\Persistence\\{$name}Repository::class,
+                // );
             }
 
             public function boot(): void

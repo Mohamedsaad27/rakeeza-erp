@@ -1,0 +1,13 @@
+{
+    "name": "Media",
+    "alias": "Media",
+    "description": "Media module",
+    "keywords": [
+        "Media"
+    ],
+    "priority": 0,
+    "providers": [
+        "App\\Modules\\Media\\Infrastructure\\Providers\\MediaServiceProvider"
+    ],
+    "files": []
+}

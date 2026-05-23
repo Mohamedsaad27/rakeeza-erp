@@ -14,7 +14,16 @@ class ModuleServiceProvider extends ServiceProvider
 
     public function boot(): void
     {
-        //
+        $modulesPath = app_path('Modules');
+
+        if (File::exists($modulesPath)) {
+            foreach (File::directories($modulesPath) as $module) {
+                $migrationsPath = "$module/Infrastructure/Database/Migrations";
+                if (File::isDirectory($migrationsPath)) {
+                    $this->loadMigrationsFrom($migrationsPath);
+                }
+            }
+        }
     }
 
     protected function registerModuleProviders(): void

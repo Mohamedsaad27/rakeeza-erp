@@ -1,7 +1,5 @@
 <?php
 
-use App\Models\User;
-
 return [
 
     /*
@@ -42,6 +40,16 @@ return [
             'driver' => 'session',
             'provider' => 'users',
         ],
+
+        'api' => [
+            'driver'   => 'jwt',
+            'provider' => 'users',
+        ],
+
+        'platform' => [
+            'driver'   => 'jwt',
+            'provider' => 'platform_users',
+        ],
     ],
 
     /*
@@ -64,13 +72,13 @@ return [
     'providers' => [
         'users' => [
             'driver' => 'eloquent',
-            'model' => env('AUTH_MODEL', User::class),
+            'model'  => \App\Modules\Auth\Infrastructure\Database\Models\User::class,
         ],
 
-        // 'users' => [
-        //     'driver' => 'database',
-        //     'table' => 'users',
-        // ],
+        'platform_users' => [
+            'driver' => 'eloquent',
+            'model'  => \App\Modules\PlatformUsers\Infrastructure\Database\Models\PlatformUser::class,
+        ],
     ],
 
     /*

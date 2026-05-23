@@ -33,7 +33,7 @@ There is **one physical database**. Central tables and tenant-scoped tables coex
 **Never create a separate database per tenant.**
 
 ### Central Tables
-Managed by the main Laravel connection (`DB_CONNECTION`).
+Managed by the single, default database connection.
 Contains platform-level data shared across tenants.
 
 ```
@@ -78,8 +78,7 @@ Audit:          tenant_audit_logs
 - Tenant models → `App\Modules\{Module}\Infrastructure\Database\Models`
 - Central models → `App\Modules\{CentralModule}\Infrastructure\Database\Models`
 - **Never** query a tenant table without scoping by `tenant_id`.
-- **Never** hardcode a connection string. Use model `$connection` property only for central models.
-- Tenant models do NOT set `$connection` — the tenant middleware injects `tenant_id` via the authenticated user.
+- **Never** set a connection name or specify a `$connection` property on any model (central or tenant). All models use the single default database connection.
 
 ---
 
@@ -306,7 +305,7 @@ class Contact extends Model
 ### All Central Models
 
 > Central models live in `Infrastructure/Database/Models/` inside their central module.
-> Set `$connection = 'mysql'` (or the central connection name) explicitly for clarity.
+> Central models do **NOT** specify a `$connection` property. All tables use the single default connection.
 
 ```php
 <?php
@@ -320,7 +319,6 @@ class Tenant extends Model
 {
     use HasUuid;
 
-    protected $connection = 'mysql'; // explicit — central DB
     protected $primaryKey = 'tenant_id';
     protected $keyType    = 'string';
     public $incrementing  = false;

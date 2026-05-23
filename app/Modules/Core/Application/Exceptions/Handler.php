@@ -3,6 +3,7 @@
 namespace App\Modules\Core\Application\Exceptions;
 
 use App\Modules\Core\Application\Exceptions\BaseException;
+use App\Modules\Core\Application\Exceptions\PlanLimitException;
 use App\Modules\Core\Infrastructure\Helpers\ApiResponse;
 use Illuminate\Auth\AuthenticationException;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
@@ -76,6 +77,14 @@ class Handler extends ExceptionHandler
                 401
             );
         }
+        if ($e instanceof PlanLimitException) {
+            return ApiResponse::error(
+                $e->getMessage(),
+                ['limit_key' => $e->getLimitKey(), 'current' => $e->getCurrent(), 'allowed' => $e->getAllowed()],
+                $e->getStatusCode()
+            );
+        }
+
         if ($e instanceof BaseException) {
             return ApiResponse::error(
                 $e->getMessage(),
