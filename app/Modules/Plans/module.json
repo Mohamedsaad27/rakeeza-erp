@@ -1,0 +1,11 @@
+{
+    "name": "Plans",
+    "alias": "Plans",
+    "description": "Subscription plans and tier management",
+    "keywords": ["Plans"],
+    "priority": 0,
+    "providers": [
+        "App\\Modules\\Plans\\Infrastructure\\Providers\\PlansServiceProvider"
+    ],
+    "files": []
+}

@@ -15,8 +15,8 @@
 | Framework | Laravel 13 |
 | Architecture | Custom Clean Architecture — Module-based |
 | Multi-tenancy | One physical database; central tables + tenant-scoped tables coexist. All tenant tables have `tenant_id` |
-| Auth | JWT (`tymon/jwt-auth`) — guards: `platform` (central) and `api` (tenant) |
-| Authorization | `spatie/laravel-permission` scoped per tenant |
+| Auth | JWT (`tymon/jwt-auth`) — guards: `platform` (central) and `api` (tenant); **both use the `users` table** |
+| Authorization | `spatie/laravel-permission` — guard `platform` (central admins) and guard `api` (tenant users) |
 | Multilingual | No packages — Middleware only (`SetLocale`) [Arabic - English] |
 | Billing | `laravel/cashier` |
 | Activity Log | Custom `ActivityLog` module (all other modules depend on it) |
@@ -40,7 +40,7 @@ Contains platform-level data shared across tenants.
 Central tables: tenants, plans, plan_features, features,
                 subscriptions, subscription_history,
                 invoices, payments, payment_transactions, refunds,
-                platform_users, domains,
+                domains,
                 contact_requests, demo_requests,
                 platform_notifications, platform_notification_targets,
                 audit_logs
@@ -49,6 +49,8 @@ Central tables: tenants, plans, plan_features, features,
 ### Tenant-Scoped Tables
 Every tenant table has `tenant_id CHAR(36) NOT NULL` as the **second column** after the primary key.
 All queries **must** scope on `tenant_id`.
+
+> **Exception:** The `users` table is hybrid — see [Hybrid Table — `users`](#hybrid-table--users) below.
 
 ```
 Tenant tables (all include tenant_id):
@@ -74,10 +76,25 @@ Media:          media_files
 Audit:          tenant_audit_logs
 ```
 
+### Hybrid Table — `users`
+
+All identities — tenant staff **and** platform admins — live in the single `users` table.
+
+| User type | `tenant_id` | JWT guard | Spatie guard | Routes |
+|-----------|-------------|-----------|--------------|--------|
+| Tenant user | set (NOT NULL) | `api` | `api` | `/api/v1/auth/...`, `/api/v1/{module}/...` |
+| Platform admin | `NULL` | `platform` | `platform` | `/api/v1/central/...` |
+
+- Model: `App\Modules\Auth\Infrastructure\Database\Models\User`
+- Platform admins are **not** tenant-scoped; `BelongsToTenant` leaves `tenant_id` null when no tenant context is bound.
+- Central FK columns (`changed_by`, `refunded_by`, `handled_by`, `created_by`, `audit_logs.actor_id`) reference `users.user_id`.
+- Platform admins require globally unique `email` / `username` (functional unique indexes when `tenant_id IS NULL`).
+- Use `$user->isPlatformUser()` (returns `true` when `tenant_id === null`) to distinguish platform admins in code.
+
 ### Rules for DB access
 - Tenant models → `App\Modules\{Module}\Infrastructure\Database\Models`
 - Central models → `App\Modules\{CentralModule}\Infrastructure\Database\Models`
-- **Never** query a tenant table without scoping by `tenant_id`.
+- **Never** query a tenant table without scoping by `tenant_id` (except `users` rows where `tenant_id IS NULL` for platform admin lookups).
 - **Never** set a connection name or specify a `$connection` property on any model (central or tenant). All models use the single default database connection.
 
 ---
@@ -91,14 +108,15 @@ app/
 │   │
 │   ├── — Central Modules —
 │   ├── Tenants/            ← Tenant CRUD, onboarding, provisioning, domain management
-│   ├── PlatformUsers/      ← Super-admin and support staff
 │   ├── Plans/              ← Subscription tier management
 │   ├── Billing/            ← Cashier integration, invoices, payments, refunds
 │   │
+│   ├── — Identity (Both) —
+│   ├── Auth/               ← Login, logout, token refresh for both guards (`api` + `platform`)
+│   ├── Users/              ← User CRUD, profile management (tenant users + platform admins)
+│   ├── Roles/              ← Role & permission CRUD, assignment (`api` and `platform` guards)
+│   │
 │   ├── — Tenant Modules —
-│   ├── Auth/               ← Login, register, password reset, token refresh
-│   ├── Users/              ← Tenant user CRUD, profile management
-│   ├── Roles/              ← Role & permission CRUD, assignment
 │   ├── Contacts/           ← Customers & suppliers (CRM)
 │   ├── Products/           ← Product catalog: brands, categories, units, variants
 │   ├── Inventory/          ← Warehouses, stock movements, adjustments, transfers
@@ -774,7 +792,7 @@ All monetary / quantity columns **must** use `decimal(15,4)`.
 
 ### Migration Rules Checklist
 - [ ] Primary key: `uuid('{table_singular}_id')->primary()`
-- [ ] `tenant_id uuid()->index()` is the **second** column on every tenant table
+- [ ] `tenant_id uuid()->index()` is the **second** column on every tenant table (`users.tenant_id` is **nullable** — platform admins have `tenant_id = null`)
 - [ ] Bilingual text: both `name_ar` and `name_en` present
 - [ ] Financial decimals: `decimal(15,4)` — never float or double
 - [ ] `->nullable()` only when the field is truly optional
@@ -877,7 +895,9 @@ class GenerateSalesReportJob implements ShouldQueue
 
 ## 11. Roles & Permissions
 
-Using `spatie/laravel-permission` **inside each tenant's scoped tables** (`roles`, `permissions`, `role_user`, etc. — all with `tenant_id`).
+Using `spatie/laravel-permission` with two guards:
+- **`api`** — tenant-scoped roles/permissions (tables include `tenant_id`)
+- **`platform`** — central platform admin roles/permissions (not tenant-scoped)
 
 ### Configuration override (required)
 ```php
@@ -920,6 +940,15 @@ Examples:
 | `cashier` | api | pos.access, payments.*, contacts.view |
 | `hr` | api | hr.*, employees.*, payroll.* |
 | `viewer` | api | *.view only |
+
+### Default Platform Roles (seeded centrally)
+
+| Role | Guard | Typical Permissions |
+|------|-------|---------------------|
+| `super_admin` | platform | Full platform access |
+| `support` | platform | Tenant read, billing read, contact/demo request handling |
+
+Platform role checks use `auth('platform')->user()` and the `platform` guard — never the `api` guard.
 
 ### Usage
 ```php
@@ -1192,12 +1221,11 @@ The `ActivityLog` module writes to `tenant_audit_logs` (tenant-scoped) and optio
 | Module | Rules File | DB Tier |
 |--------|-----------|---------|
 | Core / Shared | `.cursor/rules/core.md` | Both |
-| Auth & JWT | `.cursor/rules/auth.md` | Tenant |
+| Auth & JWT | `.cursor/rules/auth.md` | Both |
 | Tenant Scoping | `.cursor/rules/tenancy.md` | Both |
 | Tenants / Platform | `.cursor/rules/tenants.md` | Central |
-| Platform Users | `.cursor/rules/platform-users.md` | Central |
 | Plans & Billing | `.cursor/rules/billing.md` | Central |
-| Users & Roles | `.cursor/rules/users.md` | Tenant |
+| Users & Roles | `.cursor/rules/users.md` | Both |
 | Contacts (CRM) | `.cursor/rules/contacts.md` | Tenant |
 | Products | `.cursor/rules/products.md` | Tenant |
 | Inventory | `.cursor/rules/inventory.md` | Tenant |
@@ -1220,7 +1248,7 @@ The `ActivityLog` module writes to `tenant_audit_logs` (tenant-scoped) and optio
 | Phase | Modules | Priority |
 |-------|---------|----------|
 | **P0 — Foundation** | Core, ActivityLog, Tenants (central), tenant-scoping middleware, JWT guards | Week 1 |
-| **P1 — Identity & Access** | PlatformUsers, Auth, Users, Roles, Settings | Weeks 2–3 |
+| **P1 — Identity & Access** | Auth, Users, Roles, Settings | Weeks 2–3 |
 | **P2 — CRM & Catalog** | Contacts, Products, bulk import jobs | Weeks 4–5 |
 | **P3 — Inventory** | Inventory (warehouses, stock movements, adjustments, transfers) | Week 6 |
 | **P4 — Transactions** | Sales, Purchasing, Payments, reference number generation | Weeks 7–8 |

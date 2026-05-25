@@ -12,7 +12,16 @@ return Application::configure(basePath: dirname(__DIR__))
         health: '/up',
     )
     ->withMiddleware(function (Middleware $middleware): void {
-        //
+        $middleware->alias([
+            'scope.tenant' => \App\Modules\Core\Presentation\Http\Middleware\ScopeTenant::class,
+            'set.locale'     => \App\Modules\Core\Presentation\Http\Middleware\SetLocale::class,
+            'role'           => \Spatie\Permission\Middleware\RoleMiddleware::class,
+            'permission'     => \Spatie\Permission\Middleware\PermissionMiddleware::class,
+        ]);
+
+        $middleware->api(prepend: [
+            \App\Modules\Core\Presentation\Http\Middleware\SetLocale::class,
+        ]);
     })
     ->withExceptions(function (Exceptions $exceptions): void {
         //

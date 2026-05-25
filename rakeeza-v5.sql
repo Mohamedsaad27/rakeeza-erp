@@ -8,29 +8,6 @@ SET NAMES utf8mb4;
 SET FOREIGN_KEY_CHECKS = 0;
 
 -- ============================================================
---  CENTRAL · PLATFORM ADMINISTRATORS
--- ============================================================
-
-CREATE TABLE `platform_users` (
-  `platform_user_id` CHAR(36)        NOT NULL,
-  `name`               VARCHAR(255)    NOT NULL,
-  `email`              VARCHAR(255)    NOT NULL,
-  `password`           VARCHAR(255)    NOT NULL,
-  `is_active`          TINYINT(1)      NOT NULL DEFAULT 1,
-  `profile_image`      VARCHAR(500)    DEFAULT NULL,
-  `email_verified_at`  TIMESTAMP       NULL DEFAULT NULL,
-  `last_login_at`      TIMESTAMP       NULL DEFAULT NULL,
-  `created_at`         TIMESTAMP       NULL DEFAULT NULL,
-  `updated_at`         TIMESTAMP       NULL DEFAULT NULL,
-  `deleted_at`         TIMESTAMP       NULL DEFAULT NULL,
-  PRIMARY KEY (`platform_user_id`),
-  UNIQUE KEY `platform_users_email_unique` (`email`),
-  KEY `platform_users_is_active_idx` (`is_active`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci
-  COMMENT='Central platform administrators (super-admins, support). Not tenant-scoped.';
-
-
--- ============================================================
 --  CENTRAL · TENANCY & SUBSCRIPTION
 -- ============================================================
 
@@ -171,7 +148,7 @@ CREATE TABLE `subscription_history` (
   `old_plan_id`      CHAR(36)        DEFAULT NULL,
   `new_plan_id`      CHAR(36)        DEFAULT NULL,
   `change_type`      TINYINT         NOT NULL COMMENT '1=upgrade | 2=downgrade | 3=renew | 4=cancel',
-  `changed_by`       CHAR(36)        DEFAULT NULL COMMENT 'platform_users.id',
+  `changed_by`       CHAR(36)        DEFAULT NULL COMMENT 'users.user_id (platform admin)',
   `notes`            TEXT            DEFAULT NULL,
   `created_at`       TIMESTAMP       NULL DEFAULT NULL,
   PRIMARY KEY (`history_id`),
@@ -292,7 +269,7 @@ CREATE TABLE `refunds` (
   `amount`           DECIMAL(15,4)   NOT NULL DEFAULT 0.0000,
   `reason`           TINYINT         DEFAULT NULL COMMENT '1=duplicate | 2=fraudulent | 3=requested_by_customer | 4=other',
   `notes`            TEXT            DEFAULT NULL,
-  `refunded_by`      CHAR(36)        DEFAULT NULL COMMENT 'platform_users.id',
+  `refunded_by`      CHAR(36)        DEFAULT NULL COMMENT 'users.user_id (platform admin)',
   `gateway_refund_id` VARCHAR(255)   DEFAULT NULL,
   `status`           TINYINT         NOT NULL DEFAULT 1 COMMENT '1=pending | 2=processed | 3=failed',
   `created_at`       TIMESTAMP       NULL DEFAULT NULL,
@@ -320,7 +297,7 @@ CREATE TABLE `contact_requests` (
   `company`    VARCHAR(255)    DEFAULT NULL,
   `message`    TEXT            DEFAULT NULL,
   `is_handled` TINYINT(1)      NOT NULL DEFAULT 0,
-  `handled_by` CHAR(36)        DEFAULT NULL COMMENT 'platform_users.id',
+  `handled_by` CHAR(36)        DEFAULT NULL COMMENT 'users.user_id (platform admin)',
   `handled_at` TIMESTAMP       NULL DEFAULT NULL,
   `created_at` TIMESTAMP       NULL DEFAULT NULL,
   `updated_at` TIMESTAMP       NULL DEFAULT NULL,
@@ -338,7 +315,7 @@ CREATE TABLE `demo_requests` (
   `company_size` VARCHAR(50)     DEFAULT NULL,
   `notes`        TEXT            DEFAULT NULL,
   `is_handled`   TINYINT(1)      NOT NULL DEFAULT 0,
-  `handled_by`   CHAR(36)        DEFAULT NULL COMMENT 'platform_users.id',
+  `handled_by`   CHAR(36)        DEFAULT NULL COMMENT 'users.user_id (platform admin)',
   `handled_at`   TIMESTAMP       NULL DEFAULT NULL,
   `created_at`   TIMESTAMP       NULL DEFAULT NULL,
   `updated_at`   TIMESTAMP       NULL DEFAULT NULL,
@@ -360,7 +337,7 @@ CREATE TABLE `platform_notifications` (
   `target`       TINYINT         NOT NULL DEFAULT 1 COMMENT '1=all_tenants | 2=specific_tenants | 3=specific_plans',
   `scheduled_at` TIMESTAMP       NULL DEFAULT NULL,
   `sent_at`      TIMESTAMP       NULL DEFAULT NULL,
-  `created_by`   CHAR(36)        DEFAULT NULL COMMENT 'platform_users.id',
+  `created_by`   CHAR(36)        DEFAULT NULL COMMENT 'users.user_id (platform admin)',
   `created_at`   TIMESTAMP       NULL DEFAULT NULL,
   `updated_at`   TIMESTAMP       NULL DEFAULT NULL,
   PRIMARY KEY (`platform_notification_id`),
@@ -391,8 +368,8 @@ CREATE TABLE `platform_notification_targets` (
 -- ─────────────────────────────────────────────────────────
 CREATE TABLE `audit_logs` (
   `audit_log_id` CHAR(36)        NOT NULL,
-  `actor_type`   VARCHAR(50)     NOT NULL DEFAULT 'platform_user' COMMENT 'platform_user | system',
-  `actor_id`     CHAR(36)        DEFAULT NULL COMMENT 'platform_users.id',
+  `actor_type`   VARCHAR(50)     NOT NULL DEFAULT 'user' COMMENT 'user | system',
+  `actor_id`     CHAR(36)        DEFAULT NULL COMMENT 'users.user_id',
   `tenant_id`    CHAR(36)        DEFAULT NULL COMMENT 'NULL = platform-level event',
   `event`        VARCHAR(100)    NOT NULL COMMENT 'tenant.provisioned | subscription.cancelled | plan.changed',
   `subject_type` VARCHAR(100)    DEFAULT NULL,
@@ -523,7 +500,7 @@ CREATE TABLE `branches` (
 
 CREATE TABLE `users` (
   `user_id` CHAR(36)        NOT NULL,
-  `tenant_id`     CHAR(36)        NOT NULL,
+  `tenant_id`     CHAR(36)        DEFAULT NULL COMMENT 'NULL = platform admin (super-admin, support)',
   `branch_id`     CHAR(36)        DEFAULT NULL COMMENT 'Default/home branch',
   `name`          VARCHAR(255)    NOT NULL,
   `username`      VARCHAR(255)    NOT NULL,
@@ -541,13 +518,16 @@ CREATE TABLE `users` (
   PRIMARY KEY (`user_id`),
   UNIQUE KEY `users_tenant_username_unique` (`tenant_id`, `username`),
   UNIQUE KEY `users_tenant_email_unique`    (`tenant_id`, `email`),
+  UNIQUE KEY `users_platform_email_unique`    ((CASE WHEN `tenant_id` IS NULL THEN `email`    END)),
+  UNIQUE KEY `users_platform_username_unique` ((CASE WHEN `tenant_id` IS NULL THEN `username` END)),
   KEY `users_tenant_id_idx`     (`tenant_id`),
   KEY `users_branch_id_fk`      (`branch_id`),
   CONSTRAINT `users_tenant_id_foreign`
     FOREIGN KEY (`tenant_id`) REFERENCES `tenants`  (`id`) ON DELETE CASCADE,
   CONSTRAINT `users_branch_id_foreign`
     FOREIGN KEY (`branch_id`) REFERENCES `branches` (`id`) ON DELETE SET NULL
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci
+  COMMENT='All users: tenant-scoped (tenant_id set) and platform admins (tenant_id NULL).';
 
 CREATE TABLE `password_resets` (
   `password_reset_id` CHAR(36)        NOT NULL,

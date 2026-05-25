@@ -1,0 +1,11 @@
+{
+    "name": "Features",
+    "alias": "Features",
+    "description": "Platform feature flags catalog",
+    "keywords": ["Features"],
+    "priority": 0,
+    "providers": [
+        "App\\Modules\\Features\\Infrastructure\\Providers\\FeaturesServiceProvider"
+    ],
+    "files": []
+}

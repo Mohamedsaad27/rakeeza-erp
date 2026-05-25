@@ -1,0 +1,1167 @@
+{
+    "openapi": "3.0.3",
+    "info": {
+        "title": "Rakeeza ERP API",
+        "description": "Multi-tenant commercial ERP platform. Base URL prefix: /api/v1. Standard envelope: { isSuccess, message, data, meta? }. Set Accept-Language header to ar or en.",
+        "version": "1.0.0"
+    },
+    "servers": [
+        {
+            "url": "/api/v1",
+            "description": "API v1"
+        }
+    ],
+    "tags": [
+        {
+            "name": "Auth",
+            "description": "Tenant authentication (guard: api)"
+        },
+        {
+            "name": "Central Auth",
+            "description": "Platform admin authentication (guard: platform)"
+        },
+        {
+            "name": "Roles",
+            "description": "Tenant role management"
+        },
+        {
+            "name": "Permissions",
+            "description": "Tenant permission catalog and custom permissions"
+        },
+        {
+            "name": "Features",
+            "description": "Platform feature flags catalog"
+        },
+        {
+            "name": "Plans",
+            "description": "Subscription plans, limits, and feature assignment"
+        }
+    ],
+    "paths": {
+        "/auth/login": {
+            "post": {
+                "tags": [
+                    "Auth"
+                ],
+                "summary": "Tenant login",
+                "description": "Authenticate a tenant user. Requires tenant_id.",
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/TenantLoginRequest"
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/auth/register": {
+            "post": {
+                "tags": [
+                    "Auth"
+                ],
+                "summary": "Tenant register",
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/RegisterRequest"
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/auth/logout": {
+            "post": {
+                "tags": [
+                    "Auth"
+                ],
+                "summary": "Tenant logout",
+                "security": [
+                    {
+                        "tenantBearerAuth": []
+                    }
+                ]
+            }
+        },
+        "/auth/refresh": {
+            "post": {
+                "tags": [
+                    "Auth"
+                ],
+                "summary": "Refresh tenant token",
+                "security": [
+                    {
+                        "tenantBearerAuth": []
+                    }
+                ]
+            }
+        },
+        "/auth/me": {
+            "get": {
+                "tags": [
+                    "Auth"
+                ],
+                "summary": "Get authenticated tenant user",
+                "security": [
+                    {
+                        "tenantBearerAuth": []
+                    }
+                ]
+            }
+        },
+        "/auth/forgot-password": {
+            "post": {
+                "tags": [
+                    "Auth"
+                ],
+                "summary": "Request password reset",
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/ForgotPasswordRequest"
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/auth/reset-password": {
+            "post": {
+                "tags": [
+                    "Auth"
+                ],
+                "summary": "Reset password",
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/ResetPasswordRequest"
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/central/auth/login": {
+            "post": {
+                "tags": [
+                    "Central Auth"
+                ],
+                "summary": "Platform admin login",
+                "description": "Authenticate a platform user (tenant_id is null). No tenant_id in body.",
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/PlatformLoginRequest"
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/central/auth/logout": {
+            "post": {
+                "tags": [
+                    "Central Auth"
+                ],
+                "summary": "Platform admin logout",
+                "security": [
+                    {
+                        "platformBearerAuth": []
+                    }
+                ]
+            }
+        },
+        "/central/auth/refresh": {
+            "post": {
+                "tags": [
+                    "Central Auth"
+                ],
+                "summary": "Refresh platform token",
+                "security": [
+                    {
+                        "platformBearerAuth": []
+                    }
+                ]
+            }
+        },
+        "/central/auth/me": {
+            "get": {
+                "tags": [
+                    "Central Auth"
+                ],
+                "summary": "Get authenticated platform user",
+                "security": [
+                    {
+                        "platformBearerAuth": []
+                    }
+                ]
+            }
+        },
+        "/roles": {
+            "get": {
+                "tags": [
+                    "Roles"
+                ],
+                "summary": "List roles",
+                "security": [
+                    {
+                        "tenantBearerAuth": []
+                    }
+                ],
+                "parameters": [
+                    {
+                        "name": "per_page",
+                        "in": "query",
+                        "schema": {
+                            "type": "integer",
+                            "minimum": 1
+                        }
+                    }
+                ]
+            },
+            "post": {
+                "tags": [
+                    "Roles"
+                ],
+                "summary": "Create role",
+                "security": [
+                    {
+                        "tenantBearerAuth": []
+                    }
+                ],
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/StoreRoleRequest"
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/roles/{id}": {
+            "get": {
+                "tags": [
+                    "Roles"
+                ],
+                "summary": "Get role with permissions",
+                "security": [
+                    {
+                        "tenantBearerAuth": []
+                    }
+                ],
+                "parameters": [
+                    {
+                        "$ref": "#/components/parameters/UuidPathId"
+                    }
+                ]
+            },
+            "put": {
+                "tags": [
+                    "Roles"
+                ],
+                "summary": "Update role",
+                "security": [
+                    {
+                        "tenantBearerAuth": []
+                    }
+                ],
+                "parameters": [
+                    {
+                        "$ref": "#/components/parameters/UuidPathId"
+                    }
+                ],
+                "requestBody": {
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/UpdateRoleRequest"
+                            }
+                        }
+                    }
+                }
+            },
+            "delete": {
+                "tags": [
+                    "Roles"
+                ],
+                "summary": "Delete role",
+                "security": [
+                    {
+                        "tenantBearerAuth": []
+                    }
+                ],
+                "parameters": [
+                    {
+                        "$ref": "#/components/parameters/UuidPathId"
+                    }
+                ]
+            }
+        },
+        "/roles/{id}/permissions": {
+            "put": {
+                "tags": [
+                    "Roles"
+                ],
+                "summary": "Sync role permissions",
+                "security": [
+                    {
+                        "tenantBearerAuth": []
+                    }
+                ],
+                "parameters": [
+                    {
+                        "$ref": "#/components/parameters/UuidPathId"
+                    }
+                ],
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/SyncRolePermissionsRequest"
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/permissions": {
+            "get": {
+                "tags": [
+                    "Permissions"
+                ],
+                "summary": "Get permission catalog",
+                "description": "Permissions grouped by module with bilingual labels.",
+                "security": [
+                    {
+                        "tenantBearerAuth": []
+                    }
+                ]
+            },
+            "post": {
+                "tags": [
+                    "Permissions"
+                ],
+                "summary": "Create custom permission",
+                "security": [
+                    {
+                        "tenantBearerAuth": []
+                    }
+                ],
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/StoreCustomPermissionRequest"
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/permissions/matrix": {
+            "get": {
+                "tags": [
+                    "Permissions"
+                ],
+                "summary": "Permission matrix",
+                "description": "Grouped permissions plus roles and assigned permission IDs.",
+                "security": [
+                    {
+                        "tenantBearerAuth": []
+                    }
+                ]
+            }
+        },
+        "/permissions/{id}": {
+            "delete": {
+                "tags": [
+                    "Permissions"
+                ],
+                "summary": "Delete custom permission",
+                "security": [
+                    {
+                        "tenantBearerAuth": []
+                    }
+                ],
+                "parameters": [
+                    {
+                        "$ref": "#/components/parameters/UuidPathId"
+                    }
+                ]
+            }
+        },
+        "/central/features": {
+            "get": {
+                "tags": [
+                    "Features"
+                ],
+                "summary": "List feature flags",
+                "security": [
+                    {
+                        "platformBearerAuth": []
+                    }
+                ],
+                "parameters": [
+                    {
+                        "name": "per_page",
+                        "in": "query",
+                        "schema": {
+                            "type": "integer",
+                            "minimum": 1
+                        }
+                    }
+                ]
+            },
+            "post": {
+                "tags": [
+                    "Features"
+                ],
+                "summary": "Create feature",
+                "security": [
+                    {
+                        "platformBearerAuth": []
+                    }
+                ],
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/StoreFeatureRequest"
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/central/features/{id}": {
+            "get": {
+                "tags": [
+                    "Features"
+                ],
+                "summary": "Get feature",
+                "security": [
+                    {
+                        "platformBearerAuth": []
+                    }
+                ],
+                "parameters": [
+                    {
+                        "$ref": "#/components/parameters/UuidPathId"
+                    }
+                ]
+            },
+            "put": {
+                "tags": [
+                    "Features"
+                ],
+                "summary": "Update feature",
+                "security": [
+                    {
+                        "platformBearerAuth": []
+                    }
+                ],
+                "parameters": [
+                    {
+                        "$ref": "#/components/parameters/UuidPathId"
+                    }
+                ],
+                "requestBody": {
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/UpdateFeatureRequest"
+                            }
+                        }
+                    }
+                }
+            },
+            "delete": {
+                "tags": [
+                    "Features"
+                ],
+                "summary": "Delete feature",
+                "security": [
+                    {
+                        "platformBearerAuth": []
+                    }
+                ],
+                "parameters": [
+                    {
+                        "$ref": "#/components/parameters/UuidPathId"
+                    }
+                ]
+            }
+        },
+        "/central/plans": {
+            "get": {
+                "tags": [
+                    "Plans"
+                ],
+                "summary": "List subscription plans",
+                "security": [
+                    {
+                        "platformBearerAuth": []
+                    }
+                ],
+                "parameters": [
+                    {
+                        "name": "per_page",
+                        "in": "query",
+                        "schema": {
+                            "type": "integer",
+                            "minimum": 1
+                        }
+                    }
+                ]
+            },
+            "post": {
+                "tags": [
+                    "Plans"
+                ],
+                "summary": "Create plan",
+                "security": [
+                    {
+                        "platformBearerAuth": []
+                    }
+                ],
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/StorePlanRequest"
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/central/plans/{id}": {
+            "get": {
+                "tags": [
+                    "Plans"
+                ],
+                "summary": "Get plan with features and limits",
+                "security": [
+                    {
+                        "platformBearerAuth": []
+                    }
+                ],
+                "parameters": [
+                    {
+                        "$ref": "#/components/parameters/UuidPathId"
+                    }
+                ]
+            },
+            "put": {
+                "tags": [
+                    "Plans"
+                ],
+                "summary": "Update plan",
+                "security": [
+                    {
+                        "platformBearerAuth": []
+                    }
+                ],
+                "parameters": [
+                    {
+                        "$ref": "#/components/parameters/UuidPathId"
+                    }
+                ],
+                "requestBody": {
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/UpdatePlanRequest"
+                            }
+                        }
+                    }
+                }
+            },
+            "delete": {
+                "tags": [
+                    "Plans"
+                ],
+                "summary": "Delete plan",
+                "security": [
+                    {
+                        "platformBearerAuth": []
+                    }
+                ],
+                "parameters": [
+                    {
+                        "$ref": "#/components/parameters/UuidPathId"
+                    }
+                ]
+            }
+        },
+        "/central/plans/{id}/features": {
+            "put": {
+                "tags": [
+                    "Plans"
+                ],
+                "summary": "Sync plan features",
+                "security": [
+                    {
+                        "platformBearerAuth": []
+                    }
+                ],
+                "parameters": [
+                    {
+                        "$ref": "#/components/parameters/UuidPathId"
+                    }
+                ],
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/SyncPlanFeaturesRequest"
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/central/plans/{id}/limits": {
+            "put": {
+                "tags": [
+                    "Plans"
+                ],
+                "summary": "Sync plan limits",
+                "security": [
+                    {
+                        "platformBearerAuth": []
+                    }
+                ],
+                "parameters": [
+                    {
+                        "$ref": "#/components/parameters/UuidPathId"
+                    }
+                ],
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/SyncPlanLimitsRequest"
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    },
+    "components": {
+        "securitySchemes": {
+            "tenantBearerAuth": {
+                "type": "http",
+                "scheme": "bearer",
+                "bearerFormat": "JWT",
+                "description": "Tenant JWT (guard: api). Requires scope.tenant middleware on tenant module routes."
+            },
+            "platformBearerAuth": {
+                "type": "http",
+                "scheme": "bearer",
+                "bearerFormat": "JWT",
+                "description": "Platform JWT (guard: platform). Used for /central/* routes."
+            }
+        },
+        "parameters": {
+            "UuidPathId": {
+                "name": "id",
+                "in": "path",
+                "required": true,
+                "schema": {
+                    "type": "string",
+                    "format": "uuid"
+                }
+            }
+        },
+        "schemas": {
+            "TenantLoginRequest": {
+                "type": "object",
+                "required": [
+                    "tenant_id",
+                    "login",
+                    "password"
+                ],
+                "properties": {
+                    "tenant_id": {
+                        "type": "string",
+                        "format": "uuid"
+                    },
+                    "login": {
+                        "type": "string",
+                        "description": "Email or username"
+                    },
+                    "password": {
+                        "type": "string",
+                        "format": "password"
+                    }
+                }
+            },
+            "PlatformLoginRequest": {
+                "type": "object",
+                "required": [
+                    "login",
+                    "password"
+                ],
+                "properties": {
+                    "login": {
+                        "type": "string",
+                        "description": "Email or username"
+                    },
+                    "password": {
+                        "type": "string",
+                        "format": "password"
+                    }
+                }
+            },
+            "RegisterRequest": {
+                "type": "object",
+                "required": [
+                    "tenant_id",
+                    "name",
+                    "username",
+                    "email",
+                    "password",
+                    "password_confirmation"
+                ],
+                "properties": {
+                    "tenant_id": {
+                        "type": "string",
+                        "format": "uuid"
+                    },
+                    "name": {
+                        "type": "string",
+                        "maxLength": 255
+                    },
+                    "username": {
+                        "type": "string",
+                        "maxLength": 255
+                    },
+                    "email": {
+                        "type": "string",
+                        "format": "email",
+                        "maxLength": 255
+                    },
+                    "phone": {
+                        "type": "string",
+                        "maxLength": 50,
+                        "nullable": true
+                    },
+                    "password": {
+                        "type": "string",
+                        "format": "password",
+                        "minLength": 8
+                    },
+                    "password_confirmation": {
+                        "type": "string",
+                        "format": "password"
+                    }
+                }
+            },
+            "ForgotPasswordRequest": {
+                "type": "object",
+                "required": [
+                    "tenant_id",
+                    "email"
+                ],
+                "properties": {
+                    "tenant_id": {
+                        "type": "string",
+                        "format": "uuid"
+                    },
+                    "email": {
+                        "type": "string",
+                        "format": "email"
+                    }
+                }
+            },
+            "ResetPasswordRequest": {
+                "type": "object",
+                "required": [
+                    "tenant_id",
+                    "email",
+                    "token",
+                    "password",
+                    "password_confirmation"
+                ],
+                "properties": {
+                    "tenant_id": {
+                        "type": "string",
+                        "format": "uuid"
+                    },
+                    "email": {
+                        "type": "string",
+                        "format": "email"
+                    },
+                    "token": {
+                        "type": "string"
+                    },
+                    "password": {
+                        "type": "string",
+                        "format": "password",
+                        "minLength": 8
+                    },
+                    "password_confirmation": {
+                        "type": "string",
+                        "format": "password"
+                    }
+                }
+            },
+            "StoreRoleRequest": {
+                "type": "object",
+                "required": [
+                    "name",
+                    "name_en",
+                    "name_ar"
+                ],
+                "properties": {
+                    "name": {
+                        "type": "string",
+                        "maxLength": 150,
+                        "description": "Slug key"
+                    },
+                    "name_en": {
+                        "type": "string",
+                        "maxLength": 255
+                    },
+                    "name_ar": {
+                        "type": "string",
+                        "maxLength": 255
+                    },
+                    "display_name_en": {
+                        "type": "string",
+                        "maxLength": 255,
+                        "nullable": true
+                    },
+                    "display_name_ar": {
+                        "type": "string",
+                        "maxLength": 255,
+                        "nullable": true
+                    },
+                    "description_en": {
+                        "type": "string",
+                        "maxLength": 500,
+                        "nullable": true
+                    },
+                    "description_ar": {
+                        "type": "string",
+                        "maxLength": 500,
+                        "nullable": true
+                    }
+                }
+            },
+            "UpdateRoleRequest": {
+                "type": "object",
+                "properties": {
+                    "name_en": {
+                        "type": "string",
+                        "maxLength": 255
+                    },
+                    "name_ar": {
+                        "type": "string",
+                        "maxLength": 255
+                    },
+                    "display_name_en": {
+                        "type": "string",
+                        "maxLength": 255,
+                        "nullable": true
+                    },
+                    "display_name_ar": {
+                        "type": "string",
+                        "maxLength": 255,
+                        "nullable": true
+                    },
+                    "description_en": {
+                        "type": "string",
+                        "maxLength": 500,
+                        "nullable": true
+                    },
+                    "description_ar": {
+                        "type": "string",
+                        "maxLength": 500,
+                        "nullable": true
+                    },
+                    "is_active": {
+                        "type": "boolean"
+                    }
+                }
+            },
+            "SyncRolePermissionsRequest": {
+                "type": "object",
+                "required": [
+                    "permission_ids"
+                ],
+                "properties": {
+                    "permission_ids": {
+                        "type": "array",
+                        "items": {
+                            "type": "string",
+                            "format": "uuid"
+                        }
+                    }
+                }
+            },
+            "StoreCustomPermissionRequest": {
+                "type": "object",
+                "required": [
+                    "name",
+                    "module",
+                    "label_en",
+                    "label_ar"
+                ],
+                "properties": {
+                    "name": {
+                        "type": "string",
+                        "maxLength": 150,
+                        "pattern": "^[a-z0-9._]+$"
+                    },
+                    "module": {
+                        "type": "string",
+                        "maxLength": 100
+                    },
+                    "label_en": {
+                        "type": "string",
+                        "maxLength": 255
+                    },
+                    "label_ar": {
+                        "type": "string",
+                        "maxLength": 255
+                    },
+                    "description_en": {
+                        "type": "string",
+                        "maxLength": 500,
+                        "nullable": true
+                    },
+                    "description_ar": {
+                        "type": "string",
+                        "maxLength": 500,
+                        "nullable": true
+                    }
+                }
+            },
+            "StoreFeatureRequest": {
+                "type": "object",
+                "required": [
+                    "name_en",
+                    "name_ar",
+                    "code"
+                ],
+                "properties": {
+                    "name_en": {
+                        "type": "string",
+                        "maxLength": 150
+                    },
+                    "name_ar": {
+                        "type": "string",
+                        "maxLength": 150
+                    },
+                    "code": {
+                        "type": "string",
+                        "maxLength": 100
+                    },
+                    "description_en": {
+                        "type": "string",
+                        "nullable": true
+                    },
+                    "description_ar": {
+                        "type": "string",
+                        "nullable": true
+                    },
+                    "is_active": {
+                        "type": "boolean"
+                    }
+                }
+            },
+            "UpdateFeatureRequest": {
+                "type": "object",
+                "properties": {
+                    "name_en": {
+                        "type": "string",
+                        "maxLength": 150
+                    },
+                    "name_ar": {
+                        "type": "string",
+                        "maxLength": 150
+                    },
+                    "description_en": {
+                        "type": "string",
+                        "nullable": true
+                    },
+                    "description_ar": {
+                        "type": "string",
+                        "nullable": true
+                    },
+                    "is_active": {
+                        "type": "boolean"
+                    }
+                }
+            },
+            "StorePlanRequest": {
+                "type": "object",
+                "required": [
+                    "name_en",
+                    "name_ar",
+                    "price",
+                    "billing_cycle"
+                ],
+                "properties": {
+                    "name_en": {
+                        "type": "string",
+                        "maxLength": 150
+                    },
+                    "name_ar": {
+                        "type": "string",
+                        "maxLength": 150
+                    },
+                    "price": {
+                        "type": "number",
+                        "minimum": 0
+                    },
+                    "billing_cycle": {
+                        "type": "integer",
+                        "enum": [
+                            1,
+                            2,
+                            3
+                        ],
+                        "description": "1=monthly, 2=quarterly, 3=yearly"
+                    },
+                    "trial_days": {
+                        "type": "integer",
+                        "minimum": 0
+                    },
+                    "max_users": {
+                        "type": "integer",
+                        "minimum": 1,
+                        "nullable": true
+                    },
+                    "max_branches": {
+                        "type": "integer",
+                        "minimum": 1,
+                        "nullable": true
+                    },
+                    "is_active": {
+                        "type": "boolean"
+                    }
+                }
+            },
+            "UpdatePlanRequest": {
+                "type": "object",
+                "properties": {
+                    "name_en": {
+                        "type": "string",
+                        "maxLength": 150
+                    },
+                    "name_ar": {
+                        "type": "string",
+                        "maxLength": 150
+                    },
+                    "price": {
+                        "type": "number",
+                        "minimum": 0
+                    },
+                    "billing_cycle": {
+                        "type": "integer",
+                        "enum": [
+                            1,
+                            2,
+                            3
+                        ]
+                    },
+                    "trial_days": {
+                        "type": "integer",
+                        "minimum": 0
+                    },
+                    "max_users": {
+                        "type": "integer",
+                        "minimum": 1,
+                        "nullable": true
+                    },
+                    "max_branches": {
+                        "type": "integer",
+                        "minimum": 1,
+                        "nullable": true
+                    },
+                    "is_active": {
+                        "type": "boolean"
+                    }
+                }
+            },
+            "SyncPlanFeaturesRequest": {
+                "type": "object",
+                "required": [
+                    "features"
+                ],
+                "properties": {
+                    "features": {
+                        "type": "array",
+                        "items": {
+                            "type": "object",
+                            "required": [
+                                "feature_id"
+                            ],
+                            "properties": {
+                                "feature_id": {
+                                    "type": "string",
+                                    "format": "uuid"
+                                },
+                                "enabled": {
+                                    "type": "boolean"
+                                }
+                            }
+                        }
+                    }
+                }
+            },
+            "SyncPlanLimitsRequest": {
+                "type": "object",
+                "required": [
+                    "limits"
+                ],
+                "properties": {
+                    "limits": {
+                        "type": "array",
+                        "items": {
+                            "type": "object",
+                            "required": [
+                                "key",
+                                "value"
+                            ],
+                            "properties": {
+                                "key": {
+                                    "type": "string",
+                                    "maxLength": 100
+                                },
+                                "value": {
+                                    "type": "integer",
+                                    "minimum": 0
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    }
+}

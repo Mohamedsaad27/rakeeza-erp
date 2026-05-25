@@ -2,6 +2,7 @@
 
 use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Schema;
 
 return new class extends Migration
@@ -36,7 +37,7 @@ return new class extends Migration
         // 2. users
         Schema::create('users', function (Blueprint $table) {
             $table->uuid('user_id')->primary();
-            $table->uuid('tenant_id')->index('users_tenant_id_idx');
+            $table->uuid('tenant_id')->nullable()->index('users_tenant_id_idx')->comment('NULL = platform admin (super-admin, support)');
             $table->uuid('branch_id')->nullable()->index('users_branch_id_fk')->comment('Default/home branch');
             $table->string('name', 255);
             $table->string('username', 255);
@@ -57,10 +58,14 @@ return new class extends Migration
             $table->foreign('branch_id')->references('branch_id')->on('branches')->onDelete('set null');
         });
 
+        // Platform admins (tenant_id NULL) need globally unique email/username
+        DB::statement('CREATE UNIQUE INDEX users_platform_email_unique ON users ((CASE WHEN tenant_id IS NULL THEN email END))');
+        DB::statement('CREATE UNIQUE INDEX users_platform_username_unique ON users ((CASE WHEN tenant_id IS NULL THEN username END))');
+
         // 3. password_resets
         Schema::create('password_resets', function (Blueprint $table) {
             $table->uuid('password_reset_id')->primary();
-            $table->uuid('tenant_id')->nullable()->index('password_resets_tenant_id_idx')->comment('Nullable to support platform_users resets too');
+            $table->uuid('tenant_id')->nullable()->index('password_resets_tenant_id_idx')->comment('Nullable for platform admin password resets');
             $table->string('email')->index('password_resets_email_idx');
             $table->string('token');
             $table->timestamp('created_at')->nullable();

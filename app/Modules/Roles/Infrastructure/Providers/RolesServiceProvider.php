@@ -14,6 +14,9 @@ class RolesServiceProvider extends ServiceProvider
 
     public function boot(): void
     {
-        //
+        $this->loadTranslationsFrom(
+            __DIR__ . '/../../Presentation/Resources/Lang',
+            'roles',
+        );
     }
 }

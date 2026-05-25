@@ -119,7 +119,7 @@ return new class extends Migration
             $table->uuid('old_plan_id')->nullable()->index('sub_hist_old_plan_fk');
             $table->uuid('new_plan_id')->nullable()->index('sub_hist_new_plan_fk');
             $table->tinyInteger('change_type')->comment('1=upgrade | 2=downgrade | 3=renew | 4=cancel');
-            $table->uuid('changed_by')->nullable()->comment('platform_users.platform_user_id');
+            $table->uuid('changed_by')->nullable()->comment('users.user_id (platform admin)');
             $table->text('notes')->nullable();
             $table->timestamp('created_at')->nullable();
 
@@ -216,7 +216,7 @@ return new class extends Migration
             $table->decimal('amount', 15, 4)->default(0.0000);
             $table->tinyInteger('reason')->nullable()->comment('1=duplicate | 2=fraudulent | 3=requested_by_customer | 4=other');
             $table->text('notes')->nullable();
-            $table->uuid('refunded_by')->nullable()->comment('platform_users.platform_user_id');
+            $table->uuid('refunded_by')->nullable()->comment('users.user_id (platform admin)');
             $table->string('gateway_refund_id', 255)->nullable();
             $table->tinyInteger('status')->default(1)->comment('1=pending | 2=processed | 3=failed');
             $table->timestamp('created_at')->nullable();
@@ -236,7 +236,7 @@ return new class extends Migration
             $table->string('company')->nullable();
             $table->text('message')->nullable();
             $table->boolean('is_handled')->default(false)->index('contact_requests_is_handled_idx');
-            $table->uuid('handled_by')->nullable()->comment('platform_users.platform_user_id');
+            $table->uuid('handled_by')->nullable()->comment('users.user_id (platform admin)');
             $table->timestamp('handled_at')->nullable();
             $table->timestamps();
         });
@@ -251,7 +251,7 @@ return new class extends Migration
             $table->string('company_size', 50)->nullable();
             $table->text('notes')->nullable();
             $table->boolean('is_handled')->default(false)->index('demo_requests_is_handled_idx');
-            $table->uuid('handled_by')->nullable()->comment('platform_users.platform_user_id');
+            $table->uuid('handled_by')->nullable()->comment('users.user_id (platform admin)');
             $table->timestamp('handled_at')->nullable();
             $table->timestamps();
         });
@@ -267,7 +267,7 @@ return new class extends Migration
             $table->tinyInteger('target')->default(1)->comment('1=all_tenants | 2=specific_tenants | 3=specific_plans');
             $table->timestamp('scheduled_at')->nullable();
             $table->timestamp('sent_at')->nullable();
-            $table->uuid('created_by')->nullable()->comment('platform_users.platform_user_id');
+            $table->uuid('created_by')->nullable()->comment('users.user_id (platform admin)');
             $table->timestamps();
         });
 
